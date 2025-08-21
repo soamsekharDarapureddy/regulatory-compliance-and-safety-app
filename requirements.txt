@@ -1,0 +1,10 @@
+# requirements.txt
+
+# Core web framework for the user interface
+streamlit
+
+# Libraries for data handling and parsing
+pandas
+pdfplumber
+openpyxl
+python-docx
