@@ -97,34 +97,37 @@ TEST_CASE_KNOWLEDGE_BASE = {
 }
 for k, v in list(TEST_CASE_KNOWLEDGE_BASE.items()): TEST_CASE_KNOWLEDGE_BASE[k + " test"] = v
 
-# --- DEFINITIVE, FULLY RESTORED AND EXPANDED COMPONENT DATABASE ---
+# --- MODIFICATION: Separated Component Databases ---
+# Main database for non-cluster parts
 COMPONENT_KNOWLEDGE_BASE = {
-    # Original E-Bike Systems Components
+    # VCU, Motor Controller, Charger, BMS
     "spc560p50l3": {"subsystem": "VCU", "part_name": "32-bit MCU", "manufacturer": "STMicroelectronics", "certifications": "AEC-Q100"},
     "tja1051t": {"subsystem": "VCU", "part_name": "High-speed CAN Transceiver", "manufacturer": "NXP", "certifications": "AEC-Q100"},
     "tle4275g": {"subsystem": "VCU", "part_name": "5V LDO Regulator", "manufacturer": "Infineon", "certifications": "AEC-Q100"},
     "fsbb30ch60f": {"subsystem": "Motor Controller", "part_name": "SPM IGBT Module", "manufacturer": "ON Semi", "voltage": "600V"},
     "wslp2512r0100fe": {"subsystem": "Motor Controller", "part_name": "Current Sense Resistor", "manufacturer": "Vishay", "certifications": "AEC-Q200"},
-    "mb9df125": {"subsystem": "Instrument Cluster", "part_name": "MCU with Graphics", "manufacturer": "Spansion (Cypress)", "certifications": "AEC-Q100"},
     "uc3843bd1g": {"subsystem": "Charger/DC-DC", "part_name": "PWM Controller", "manufacturer": "ON Semi", "certifications": "AEC-Q100"},
     "eeh-azt1v471": {"subsystem": "Charger/DC-DC", "part_name": "Hybrid Polymer Capacitor", "manufacturer": "Panasonic", "certifications": "AEC-Q200"},
     "bq76952": {"subsystem": "BMS", "part_name": "16-Series Battery Monitor", "manufacturer": "Texas Instruments", "voltage": "Up to 80V"},
-    
-    # Original General Purpose Components
+    # General Purpose Components
     "lm7805": {"subsystem": "General", "part_name": "5V Regulator", "manufacturer": "TI"},
     "irfz44n": {"subsystem": "General", "part_name": "N-Channel MOSFET", "manufacturer": "Infineon"},
     "stm32f407": {"subsystem": "General", "part_name": "ARM Cortex-M4 MCU", "manufacturer": "STMicroelectronics"},
     "1n4007": {"subsystem": "General", "part_name": "Rectifier Diode", "manufacturer": "Multiple"},
     "irfb4110": {"manufacturer": "Infineon", "function": "N‑MOSFET", "voltage": "100V", "current": "180A"},
+}
 
-    # New Components from ALS_2.0_BOM_12Nov24.xlsx
+# New, separate database for all Cluster-related parts
+CLUSTER_COMPONENT_KNOWLEDGE_BASE = {
+    # Original Instrument Cluster part
+    "mb9df125": {"subsystem": "Instrument Cluster", "part_name": "MCU with Graphics", "manufacturer": "Spansion (Cypress)", "certifications": "AEC-Q100"},
+    # Components from ALS_2.0_BOM_12Nov24.xlsx
     "grt188c81a106me13d": {"subsystem": "ALS Board", "part_name": "10uF Capacitor", "manufacturer": "Murata", "footprint": "C0603"},
     "gcm155l81e104ke02d": {"subsystem": "ALS Board", "part_name": "0.1uF Capacitor", "manufacturer": "Samsung", "footprint": "C0402"},
     "5019530507": {"subsystem": "ALS Board", "part_name": "5-Pin Header", "manufacturer": "Molex"},
     "rt0603fre0710rl": {"subsystem": "ALS Board", "part_name": "10 Ohm Resistor", "manufacturer": "YAGEO", "footprint": "R0603"},
     "veml6031x00": {"subsystem": "ALS Board", "part_name": "Ambient Light Sensor", "manufacturer": "Vishay"},
-
-    # New Components from VIC-Assembly-Module-0127000_1.0.4.pdf
+    # Components from VIC-Assembly-Module-0127000_1.0.4.pdf
     "01270019-00": {"subsystem": "VIC Module", "part_name": "ANTENNA GPS", "manufacturer": "Unknown"},
     "01270020-00": {"subsystem": "VIC Module", "part_name": "ANTENNA WIFI", "manufacturer": "Unknown"},
     "01270021-00": {"subsystem": "VIC Module", "part_name": "ANTENNA LTE", "manufacturer": "Unknown"},
@@ -295,11 +298,14 @@ elif option == "Component Information":
     st.subheader("Key Component Information", anchor=False)
     st.caption("Look up parts in the internal database or use web search shortcuts.")
     
-    part_q = st.text_input("Quick Lookup (part number)", placeholder="e.g., irfz44n, bq76952").lower().strip()
+    # Unified search across both databases
+    COMBINED_COMPONENT_DB = {**COMPONENT_KNOWLEDGE_BASE, **CLUSTER_COMPONENT_KNOWLEDGE_BASE}
+
+    part_q = st.text_input("Quick Lookup (part number)", placeholder="e.g., irfz44n, veml6031x00").lower().strip()
     if st.button("Find Component"):
-        found_key = next((k for k in COMPONENT_KNOWLEDGE_BASE if k in part_q), None)
+        found_key = next((k for k in COMBINED_COMPONENT_DB if k in part_q), None)
         if found_key:
-            st.session_state.found_component = {"part_number": found_key, **COMPONENT_KNOWLEDGE_BASE[found_key]}
+            st.session_state.found_component = {"part_number": found_key, **COMBINED_COMPONENT_DB[found_key]}
             st.success(f"Found: {found_key.upper()}. Details populated below.")
         else:
             st.session_state.found_component = {}
