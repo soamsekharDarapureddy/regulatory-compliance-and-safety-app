@@ -39,7 +39,7 @@ a { text-decoration: none; }
 # === Session State Initialization ===
 def init_session_state():
     state_defaults = {
-        "reports_verified": 0, "requirements_generated": 0, "found_component": {}, "last_pass_rate": "N/A"
+        "reports_verified": 0, "requirements_generated": 0, "found_component": {}, "last_pass_rate": "N/A", "project_db": pd.DataFrame()
     }
     for key, value in state_defaults.items():
         if key not in st.session_state:
@@ -62,248 +62,207 @@ with title_col:
     """, unsafe_allow_html=True)
 st.markdown("---")
 
-# === KNOWLEDGE BASES ===
-KEYWORD_TO_STANDARD_MAP = {
-    "safety": "ISO 26262", "asil": "ISO 26262", "fusa": "ISO 26262", "cybersecurity": "ISO/SAE 21434", "tara": "ISO/SAE 21434",
-    "penetration test": "ISO/SAE 21434", "ip rating": "IEC 60529", "ingress protection": "IEC 60529", "short circuit": "AIS-156 / IEC 62133",
-    "overcharge": "AIS-156 / ISO 12405-4", "over-discharge": "AIS-156 / ISO 12405-4", "vibration": "IEC 60068-2-6 / AIS-048",
-    "emc": "IEC 61000 / ECE R10", "environmental": "ISO 16750", "can bus": "ISO 11898", "candump": "ISO 11898", "diagnostics": "ISO 14229 (UDS)",
-    "autosar": "AUTOSAR Standard", "aspice": "Automotive SPICE (ISO/IEC 330xx)", "misra": "MISRA C/C++ Guidelines", "gps": "GNSS Performance Standards",
-    "gnss": "GNSS Performance Standards", "bluetooth": "Bluetooth Core Specification", "wifi": "IEEE 802.11", "lte": "3GPP LTE", "4g": "3GPP LTE",
-    "sim": "ISO/IEC 7816", "usb": "USB-IF Standards", "touch": "HMI/Driver Interface Spec", "os crash": "System Stability Standard",
-    "rtc": "System Real-Time Clock Spec", "memory": "Embedded System Memory Management", "modem": "3GPP Modem Interface", "watch dog": "System Watchdog Spec"
-}
 
+# === MODIFICATION: Using the new Knowledge Bases and Parsing Logic ===
+STANDARDS_KNOWLEDGE_BASE = {
+    "IP Rating": "IEC 60529", "Short Circuit Protection": "AIS-156 / IEC 62133",
+    "Overcharge Protection": "AIS-156 / ISO 12405-4", "Over-discharge Protection": "AIS-156 / ISO 12405-4",
+    "Cell Balancing": "AIS-156", "Temperature Protection": "AIS-156 / ISO 12405-4",
+    "Communication Interface (CAN)": "ISO 11898", "Vibration Test": "IEC 60068-2-6 / AIS-048",
+    "Thermal Runaway Test": "AIS-156 Amendment 3", "Braking Performance Test": "EN 15194 / ISO 4210-2",
+    "Frame Fatigue Test": "ISO 4210-6", "EMC Test": "IEC 61000 / EN 15194"
+}
 TEST_CASE_KNOWLEDGE_BASE = {
-    "over-voltage protection": {"purpose": "To verify the device can withstand voltage levels exceeding its rating.", "requirement": "DUT must survive a specified over-voltage condition without damage or creating a safety hazard.", "standard_reference": "ISO 16750-2"},
-    "short circuit protection": {"purpose": "To ensure the device can safely handle an external short circuit.", "requirement": "DUT shall safely interrupt a short-circuit without fire or explosion.", "standard_reference": "AIS-156 / IEC 62133"},
+    "over-voltage test": {"requirement": "The DUT shall withstand a specified over-voltage condition without damage.", "equipment": ["Programmable DC Power Supply", "DMM", "Oscilloscope", "Load Bank"]},
+    "short-circuit protection": {"requirement": "The DUT shall detect and safely interrupt a short-circuit condition within a specified time limit.", "equipment": ["High-Current Power Supply", "Oscilloscope with Current Probe", "Shorting Switch"]},
+    "line regulation test": {"requirement": "Output voltage must remain within tolerance as input AC voltage varies.", "equipment": ["Programmable AC Source", "Precision DMM", "Electronic Load"]},
+    "load regulation test": {"requirement": "Output voltage must remain within tolerance as the load varies from no-load to full-load.", "equipment": ["Power Source", "Precision DMM", "Programmable Electronic Load"]},
+    "efficiency test": {"requirement": "The system must meet or exceed a specified efficiency percentage at various load points.", "equipment": ["Power Analyzer", "Power Source", "Electronic Load or Dynamometer"]},
+    "insulation resistance test": {"requirement": "Resistance between live circuits and chassis/ground must be above a minimum value (e.g., >10 MΩ).", "equipment": ["Insulation Resistance Tester (Megohmmeter)"]},
+    "dielectric withstand (hipot) test": {"requirement": "Insulation must withstand a high voltage between live parts and chassis without breakdown.", "equipment": ["Hipot Tester"]},
+    "electromagnetic compatibility (emc) test": {"requirement": "The device must operate correctly in its EM environment and not emit interference.", "equipment": ["Anechoic Chamber", "Spectrum Analyzer", "LISN", "EMI Receiver"]},
+    "thermal cycling": {"requirement": "The DUT must operate reliably across a specified temperature range over multiple cycles.", "equipment": ["Thermal Chamber", "Data Logger", "Power Supply"]},
+    "vibration test": {"requirement": "The DUT must withstand vibrations simulating operational conditions without failure.", "equipment": ["Vibration Shaker Table", "Accelerometer", "Control System"]},
+    "ip rating test": {"requirement": "The enclosure must provide protection against ingress of solids and water to its specified IP rating.", "equipment": ["Dust Chamber", "Water Jet/Spray Nozzles"]},
+    "frame fatigue test": {"requirement": "The frame must endure a specified number of load cycles without cracks or structural failure.", "equipment": ["Fatigue Test Rig", "Strain Gauges", "Data Acquisition System"]},
+    "braking performance test": {"requirement": "The braking system must stop the e-bike from a specified speed within a maximum distance.", "equipment": ["Brake Test Dynamometer or GPS System", "Load Cells"]},
+    "salt spray test": {"requirement": "Coated components must resist corrosion after exposure to a salt spray environment.", "equipment": ["Salt Spray Chamber", "Saline Solution"]}
 }
-
 COMPONENT_KNOWLEDGE_BASE = {
-    "spc560p50l3": {"subsystem": "VCU", "part_name": "32-bit MCU", "manufacturer": "STMicroelectronics", "type": "Microcontroller", "package": "LQFP-100", "package_type": "SMD", "certifications": "AEC-Q100"},
-    "tja1051t": {"subsystem": "VCU", "part_name": "High-speed CAN Transceiver", "manufacturer": "NXP", "type": "Transceiver", "package": "SOIC-8", "package_type": "SMD", "certifications": "AEC-Q100"},
-    "wslp2512r0100fe": {"subsystem": "Motor Controller", "part_name": "Current Sense Shunt Resistor", "manufacturer": "Vishay", "type": "Resistor", "resistance": "10 mOhm", "tolerance": "1%", "power_rating": "1W", "package": "2512", "package_type": "SMD", "certifications": "AEC-Q200"},
-    "eeh-azt1v471": {"subsystem": "Charger/DC-DC", "part_name": "Hybrid Polymer Aluminum Electrolytic Capacitor", "manufacturer": "Panasonic", "type": "Electrolytic Capacitor", "capacitance": "470 µF", "voltage_rating": "35V", "esr": "20 mOhm", "package": "Radial Can", "package_type": "SMD", "certifications": "AEC-Q200"},
+    "bq76952": {"manufacturer": "Texas Instruments", "function": "16-Series Battery Monitor & Protector", "voltage": "Up to 80V", "package": "TQFP-48"},
+    "stm32g431": {"manufacturer": "STMicroelectronics", "function": "MCU for Motor Control", "voltage": "3.3V", "package": "LQFP-48"},
+    "l6234": {"manufacturer": "STMicroelectronics", "function": "DMOS Driver for Brushless DC Motor", "voltage": "52V", "package": "PowerSO20"},
+    "lm358": {"manufacturer": "Texas Instruments", "function": "Dual Op-Amp", "voltage": "3V to 32V", "package": "SOIC-8"},
+    "tps54560": {"manufacturer": "Texas Instruments", "function": "60V, 5A Step-Down DC-DC Converter", "voltage": "4.5V to 60V Input", "package": "HTSSOP-8"},
+    "irfb4110": {"manufacturer": "Infineon", "function": "N-Channel MOSFET", "voltage": "100V", "current": "180A", "package": "TO-220AB"},
+    "irfz44n": {"manufacturer": "Vishay", "function": "N-Channel MOSFET", "voltage": "55V", "current": "49A", "package": "TO-220AB"},
+    "bs170": {"manufacturer": "onsemi", "function": "N-Channel Small Signal MOSFET", "voltage": "60V", "current": "500mA", "package": "TO-92 (Leaded)"},
+    "mmbt3904": {"manufacturer": "onsemi", "function": "NPN BJT", "voltage": "40V", "current": "200mA", "package": "SOT-23 (SMD)"},
+    "1n4007": {"manufacturer": "Multiple", "function": "General Purpose Rectifier Diode", "voltage": "1000V", "current": "1A", "package": "DO-41 (Leaded)"},
+    "1n4733a": {"manufacturer": "Vishay", "function": "5.1V Zener Diode", "voltage": "5.1V", "power": "1W", "package": "DO-41 (Leaded)"},
+    "mbr20100ct": {"manufacturer": "onsemi", "function": "Dual Schottky Rectifier", "voltage": "100V", "current": "20A", "package": "TO-220AB"},
+    "ss14": {"manufacturer": "Vishay", "function": "Schottky Rectifier Diode", "voltage": "40V", "current": "1A", "package": "SMA (SMD)"},
+    "crcw120610k0fkea": {"manufacturer": "Vishay", "function": "Thick Film Chip Resistor", "value": "10 kΩ", "tolerance": "±1%", "package": "1206 (SMD)"},
+    "cfr-25jb-52-1k": {"manufacturer": "Yageo", "function": "Carbon Film Resistor", "value": "1 kΩ", "tolerance": "±5%", "package": "Axial (Leaded)"},
+    "c1206c104k5ractu": {"manufacturer": "KEMET", "function": "MLCC", "value": "100 nF (0.1µF)", "voltage": "50V", "package": "1206 (SMD)"},
+    "eeufc1h101": {"manufacturer": "Panasonic", "function": "Aluminum Electrolytic Capacitor", "value": "100 µF", "voltage": "50V", "package": "Radial (Leaded)"}
 }
 
-# === Advanced Parser for Complex Log Formats ===
-def intelligent_parser(text: str):
-    extracted_tests = []
-    lines = text.split('\n')
-
+# --- Helper Functions from New Code ---
+def parse_report_custom(text):
+    lines, parsed_tests, current_test = text.split('\n'), [], None
     for line in lines:
         line = line.strip()
-        if not line or line.startswith('***') or "Report Generated Date & Time" in line:
+        if not line: continue
+        if match := re.match(r'^\d+\.\s+(.*)', line):
+            if current_test: parsed_tests.append(current_test)
+            test_name = match.group(1).strip().replace(':', '')
+            standard = STANDARDS_KNOWLEDGE_BASE.get(test_name, "N/A")
+            current_test = {'Name': test_name, 'Standard': standard, 'Result': 'N/A', 'Expected': 'N/A', 'Actual': 'N/A'}
             continue
-
-        test_data = {"TestName": "N/A", "Result": "N/A", "Actual": "N/A", "Standard": "N/A"}
-
-        # Pattern: `Name --> Result --> Value`
-        match = re.match(r'^(.*?)\s*-->\s*(Passed|Failed|Success)\s*-->\s*(.+)$', line, re.I)
-        if match:
-            test_data["TestName"] = match.group(1).strip()
-            test_data["Result"] = "PASS" if match.group(2).lower() in ["passed", "success"] else "FAIL"
-            test_data["Actual"] = match.group(3).strip()
-            extracted_tests.append(test_data)
-            continue
-
-        # Pattern: `Name --> Comment` (check for failure keywords)
-        match = re.match(r'^(.*?)\s*-->\s*(.+)$', line, re.I)
-        if match:
-            test_data["TestName"] = match.group(1).strip()
-            value = match.group(2).strip()
-            test_data["Actual"] = value
-            if any(kw in value.lower() for kw in ["fail", "not available", "error"]):
-                test_data["Result"] = "FAIL"
-            else:
-                test_data["Result"] = "INFO"
-            extracted_tests.append(test_data)
-            continue
-            
-        # Pattern: Diagnostic Report `Number: NAME: "RESULT"`
-        match = re.match(r'^\d+:\s*([A-Z0-9_]+):\s*"(PASS|FAIL|NA)"$', line, re.I)
-        if match:
-            test_data["TestName"] = match.group(1).replace('_', ' ').title()
-            test_data["Result"] = match.group(2).upper()
-            test_data["Actual"] = "Diagnostic log entry"
-            extracted_tests.append(test_data)
-            continue
-            
-        # Pattern: `Test Name is Success/Failure`
-        match = re.match(r'^(.+?)\s+is\s+(success|failure|passed|failed)$', line, re.I)
-        if match:
-            test_data["TestName"] = match.group(1).strip()
-            test_data["Result"] = "PASS" if match.group(2).lower() in ["success", "passed"] else "FAIL"
-            extracted_tests.append(test_data)
-            continue
-            
-        # Pattern: `Test Name Passed/Failed at ...`
-        match = re.match(r'^(.*?)\s+(Passed|Failed)\s+at\s+.*$', line, re.I)
-        if match:
-            test_data["TestName"] = match.group(1).strip()
-            test_data["Result"] = "PASS" if match.group(2).lower() == "passed" else "FAIL"
-            test_data["Actual"] = line
-            extracted_tests.append(test_data)
-            continue
-
-        # Pattern: `Test Name Success at ...`
-        match = re.match(r'^(.*?)\s+(Success)\s+at\s+.*$', line, re.I)
-        if match:
-            test_data["TestName"] = match.group(1).strip()
-            test_data["Result"] = "PASS"
-            test_data["Actual"] = line
-            extracted_tests.append(test_data)
-            continue
-
-        # Pattern: `Test Name Passed/Failed` (standalone)
-        match = re.match(r'^(.*?)\s+(Passed|Failed)$', line, re.I)
-        if match and ":" not in match.group(1):
-            test_data["TestName"] = match.group(1).strip()
-            test_data["Result"] = "PASS" if match.group(2).lower() == "passed" else "FAIL"
-            extracted_tests.append(test_data)
-            continue
-
-        # Pattern: `Key: Test Passed/Failed`
-        match = re.match(r'^(.*?):\s*Test\s+(Passed|Failed)$', line, re.I)
-        if match:
-            test_data["TestName"] = match.group(1).strip()
-            test_data["Result"] = "PASS" if match.group(2).lower() == "passed" else "FAIL"
-            extracted_tests.append(test_data)
-            continue
-            
-        # Pattern: General `Key: Value` for informational data
-        match = re.match(r'^(.*?):\s*(.+)$', line, re.I)
-        if match:
-            test_data["TestName"] = match.group(1).strip()
-            test_data["Actual"] = match.group(2).strip()
-            test_data["Result"] = "INFO"
-            extracted_tests.append(test_data)
-            continue
-
-    # Associate standards with the parsed data
-    for test in extracted_tests:
-        test_name_lower = test["TestName"].lower().replace('_', ' ')
-        for keyword, standard in KEYWORD_TO_STANDARD_MAP.items():
-            if keyword in test_name_lower:
-                test["Standard"] = standard
-                break
-    return extracted_tests
+        if current_test:
+            if match := re.match(r'-\s*Result\s*:\s*(.*)', line, re.I): current_test['Result'] = match.group(1).strip()
+            elif match := re.match(r'-\s*(?:Requirement|Required|Limit)\s*:\s*(.*)', line, re.I): current_test['Expected'] = match.group(1).strip()
+            elif match := re.match(r'-\s*(?:Triggered at|Cut-off at|Maximum Deviation:)\s*(.*)', line, re.I): current_test['Actual'] = match.group(1).strip()
+            elif not line.startswith('-') and current_test['Actual'] == 'N/A' and not re.match(r'^\d+$', line): current_test['Actual'] = line
+    if current_test: parsed_tests.append(current_test)
+    return parsed_tests
 
 def parse_report(uploaded_file):
-    if not uploaded_file: return []
     try:
-        # All files are read as text and passed to the intelligent parser
-        content = uploaded_file.getvalue().decode('utf-8', errors='ignore')
-        return intelligent_parser(content)
-        
+        if uploaded_file.type == "application/pdf":
+            with pdfplumber.open(uploaded_file) as pdf:
+                text = "".join(page.extract_text() + "\n" for page in pdf.pages if page.extract_text())
+            return parse_report_custom(text)
     except Exception as e:
-        st.error(f"An error occurred while parsing the file: {e}")
-        return []
+        st.error(f"Error parsing file: {e}")
+    return None
 
-# === Sidebar & Main App Logic ===
-option = st.sidebar.radio("Navigation Menu", ("Test Report Verification", "Test Requirement Generation", "E-Bike Component Datasheet Lookup", "Compliance Dashboard"))
-st.sidebar.info("An integrated tool for automotive compliance verification.")
+def verify_report(parsed_data):
+    return [f"Test Failed: {test.get('Name', 'Unknown')}" for test in parsed_data if isinstance(parsed_data, list) and 'FAIL' in test.get('Result', '').upper()]
 
-# --- Test Report Verification Module ---
-if option == "Test Report Verification":
-    st.subheader("Automated Test Report Verification")
-    st.caption("Upload any automotive test report (PDF, DOCX, TXT, LOG). The system parses results and classifies outcomes.")
-    uploaded_file = st.file_uploader("Upload a test report", type=["pdf", "docx", "txt", "log", "csv", "xlsx"], help="Drag and drop your DVP&R or FCT log file here.")
-    
+def generate_requirements(test_cases):
+    reqs, default_info = [], {"requirement": "Generic requirement.", "equipment": ["Not specified."]}
+    for i, user_input_line in enumerate(test_cases):
+        found_match = False
+        for known_test, details in TEST_CASE_KNOWLEDGE_BASE.items():
+            if known_test.replace(" test", "") in user_input_line.lower():
+                reqs.append({"Test Case": known_test.title(), "Requirement ID": f"REQ_{i+1:03d}", "Requirement Description": details["requirement"], "Required Equipment": ", ".join(details["equipment"])})
+                found_match = True
+                break
+        if not found_match:
+            reqs.append({"Test Case": user_input_line, "Requirement ID": f"REQ_{i+1:03d}", "Requirement Description": default_info["requirement"], "Required Equipment": default_info["equipment"]})
+    return pd.DataFrame(reqs)
+
+# ---- Streamlit App Layout from New Code ----
+option = st.sidebar.radio("Select a Module", ("Upload & Verify Test Report", "Test Requirement Generation", "Component Lookup & Database", "Dashboard & Analytics"))
+
+if option == "Upload & Verify Test Report":
+    st.header("Upload & Verify Test Report")
+    uploaded_file = st.file_uploader("Choose a report file (.pdf)", type=['pdf'])
     if uploaded_file:
         parsed_data = parse_report(uploaded_file)
-        if parsed_data:
+        if isinstance(parsed_data, list) and parsed_data:
             st.session_state.reports_verified += 1
-            failed_tests = [t for t in parsed_data if str(t.get("Result", "")).upper() == "FAIL"]
-            passed_tests = [t for t in parsed_data if str(t.get("Result", "")).upper() == "PASS"]
-            other_tests = [t for t in parsed_data if str(t.get("Result", "")).upper() not in ["PASS", "FAIL"]]
-            
-            total_classified = len(failed_tests) + len(passed_tests)
-            if total_classified > 0: st.session_state.last_pass_rate = f"{(len(passed_tests) / total_classified) * 100:.1f}%"
-            
-            st.metric("Compliance Pass Rate (Pass / (Pass+Fail))", st.session_state.last_pass_rate, delta=f"{len(failed_tests)} Failures", delta_color="inverse")
-            
-            col1, col2 = st.columns(2)
-            with col1:
-                st.markdown(f"<h4 style='color:var(--pass);'>✅ {len(passed_tests)} Passed Cases</h4>", unsafe_allow_html=True)
-                for t in passed_tests:
-                    st.markdown(f"<div class='card card-pass'>"
-                                f"<b>Test:</b> {t.get('TestName', 'N/A')}<br>"
-                                f"<b>Standard:</b> {t.get('Standard', 'N/A')}<br>"
-                                f"<b>Value:</b> {t.get('Actual', 'N/A')}"
-                                f"</div>", unsafe_allow_html=True)
-            with col2:
-                st.markdown(f"<h4 style='color:var(--fail);'>🔴 {len(failed_tests)} FAILED Cases</h4>", unsafe_allow_html=True)
-                for t in failed_tests:
-                    st.markdown(f"<div class='card card-fail'>"
-                                f"<b>Test:</b> {t.get('TestName', 'N/A')}<br>"
-                                f"<b>Standard:</b> {t.get('Standard', 'N/A')}<br>"
-                                f"<b>Value:</b> {t.get('Actual', 'N/A')}"
-                                f"</div>", unsafe_allow_html=True)
-            if other_tests:
-                with st.expander(f"View {len(other_tests)} Other/Informational Items"):
-                    for t in other_tests:
-                        st.markdown(f"<div class='card card-info'>"
-                                    f"<b>Item:</b> {t.get('TestName', 'N/A')}<br>"
-                                    f"<b>Value:</b> {t.get('Actual', 'N/A')}"
-                                    f"</div>", unsafe_allow_html=True)
-        else:
-            st.warning("No recognizable test data was extracted. Please check the file content and format.")
-
-# --- Test Requirement Generation Module ---
+            st.subheader("Parsed Report Summary")
+            for r in parsed_data:
+                st.markdown(
+                    f"**🧪 Test:** {r.get('Name', 'N/A')}<br>"
+                    f"**📘 Standard:** {r.get('Standard', 'N/A')}<br>"
+                    f"**📊 Result:** {r.get('Result', 'N/A')}<br>"
+                    f"**🎯 Expected:** {r.get('Expected', 'N/A')}<br>"
+                    f"**📌 Actual:** {r.get('Actual', 'N/A')}",
+                    unsafe_allow_html=True
+                )
+                st.markdown("---")
+        if parsed_data and st.button("Verify Report"):
+            issues = verify_report(parsed_data)
+            if issues:
+                st.error(f"Verification Complete - {len(issues)} Issues Found:")
+                for i in issues:
+                    st.write(f"- {i}")
+            else:
+                st.success("Verification Complete: Report complies with all checks.")
 elif option == "Test Requirement Generation":
-    st.subheader("Formal Test Requirement Generator")
-    st.caption("Describe needed tests. The system will generate formal requirements from its automotive knowledge base.")
-    default_cases = "Over-voltage protection test\nIP67 ingress test for VCU\nMotor controller functional safety check"
-    text = st.text_area("Enter test descriptions (one per line):", default_cases, height=120)
+    st.header("Generate Test Requirements from Test Cases")
+    st.info("Enter test cases below. The system will generate detailed requirements in a readable format.")
+    default_test_cases = "line and load regulation\nframe fatigue test\nemc test"
+    test_case_text = st.text_area("Enter test cases", default_test_cases, height=150)
     if st.button("Generate Requirements"):
-        test_cases = [l.strip() for l in text.split("\n") if l.strip()]
+        test_cases = [line.strip() for line in test_case_text.split('\\n') if line.strip()]
         if test_cases:
             st.session_state.requirements_generated += len(test_cases)
-            st.markdown("### Generated Test Requirements")
-            for i, case in enumerate(test_cases):
-                found_req = next((info for key, info in TEST_CASE_KNOWLEDGE_BASE.items() if all(word in case.lower() for word in key.split())), None)
-                st.markdown(f"<div class='card card-info'><h5>REQ-{i+1:03d}: {case.title()}</h5>", unsafe_allow_html=True)
-                if found_req:
-                    st.markdown(f"**Purpose:** {found_req['purpose']}<br>**Requirement:** {found_req['requirement']}<br>**Standard:** {found_req['standard_reference']}", unsafe_allow_html=True)
-                else:
-                    st.markdown("**Requirement:** The system shall be tested to verify performance and safety for this case, adhering to all applicable standards.")
-                st.markdown("</div>", unsafe_allow_html=True)
-
-# --- E-Bike Component Datasheet Lookup Module ---
-elif option == "E-Bike Component Datasheet Lookup":
-    st.subheader("E-Bike Component Datasheet Lookup")
-    st.caption("Search the database for automotive-grade components used in VCUs, motor controllers, clusters, and chargers.")
-    part_q = st.text_input("Enter Part Number", placeholder="e.g., SPC560P50L3, WSLP2512R0100FE...").lower().strip().replace(" ", "")
-    
-    if st.button("Find Component", use_container_width=True):
-        found_data = next(({"part_number": key.upper(), **data} for key, data in COMPONENT_KNOWLEDGE_BASE.items() if key in part_q), None)
-        st.session_state.found_component = found_data if found_data else {}
-        if not found_data:
-            st.warning("Component not in internal database. Use the research links below.")
-            if part_q:
+            requirements_df = generate_requirements(test_cases)
+            st.subheader("Generated Requirements & Equipment")
+            for _, row in requirements_df.iterrows():
+                st.markdown(
+                    f"**📝 Test Case:** {row['Test Case']}<br>"
+                    f"**🆔 Requirement ID:** {row['Requirement ID']}<br>"
+                    f"**📋 Requirement Description:**",
+                    unsafe_allow_html=True
+                )
+                st.info(row['Requirement Description'])
+                st.markdown(f"**🛠️ Required Equipment:** {row['Required Equipment']}<br>---", unsafe_allow_html=True)
+            csv = requirements_df.to_csv(index=False).encode('utf-8')
+            st.download_button("Download as CSV", data=csv, file_name="requirements.csv", mime="text/csv")
+elif option == "Component Lookup & Database":
+    st.header("Component Lookup & Database")
+    st.info(
+        "Enter a full or partial component part number to search the internal knowledge base. "
+        "If not found, you can use the web search buttons to quickly look up datasheet/spec info."
+    )
+    st.subheader("Component Lookup")
+    part_number_to_find = st.text_input(
+        "Enter Part Number to Look Up",
+        help="Not case-sensitive. Partial matches work."
+    ).lower().strip()
+    if st.button("Find Component Info"):
+        found_info, found_key = None, None
+        if part_number_to_find:
+            for key in COMPONENT_KNOWLEDGE_BASE:
+                if key in part_number_to_find:
+                    found_key, found_info = key, COMPONENT_KNOWLEDGE_BASE[key]
+                    break
+        if found_info:
+            st.session_state.found_component = {**found_info, 'part_number': part_number_to_find.upper()}
+            st.success(f"Found a match: '{found_key}' in your input '{part_number_to_find}'. Details below.")
+        else:
+            st.session_state.found_component = {}
+            st.warning("Part number not found in knowledge base. You can add it manually below.")
+            if part_number_to_find:
                 c1, c2, c3 = st.columns(3)
-                c1.link_button("Octopart", f"https://octopart.com/search?q={part_q}", use_container_width=True)
-                c2.link_button("Digi-Key", f"https://www.digikey.com/en/products/result?s={part_q}", use_container_width=True)
-                c3.link_button("Google", f"https://www.google.com/search?q={part_q}+datasheet", use_container_width=True)
+                c1.link_button("Search Octopart", f"https://octopart.com/search?q={part_number_to_find}", use_container_width=True)
+                c2.link_button("Search Digi-Key", f"https://www.digikey.com/en/products/result?s={part_number_to_find}", use_container_width=True)
+                c3.link_button("Search Mouser", f"https://www.mouser.com/Search/Refine?Keyword={part_number_to_find}", use_container_width=True)
 
-    if st.session_state.found_component:
+    st.markdown("---")
+    st.subheader("Add Component to Project Database")
+    default_data = st.session_state.get('found_component', {})
+    with st.form("component_form", clear_on_submit=True):
+        pn = st.text_input("Part Number", value=default_data.get("part_number", ""))
+        mfg = st.text_input("Manufacturer", value=default_data.get("manufacturer", ""))
+        func = st.text_input("Function", value=default_data.get("function", ""))
+        p1_label = "Value" if "resistor" in func.lower() or "capacitor" in func.lower() else "Voltage"
+        p1_val = default_data.get("value", default_data.get("voltage", ""))
+        p1 = st.text_input(p1_label, value=str(p1_val))
+        p2_label = "Package" if "resistor" in func.lower() or "capacitor" in func.lower() else "Current"
+        p2_val = default_data.get("package", default_data.get("current", ""))
+        p2 = st.text_input(p2_label, value=str(p2_val))
+        if st.form_submit_button("Add Component"):
+            if pn:
+                new_row = pd.DataFrame([{
+                    "Part Number": pn, "Manufacturer": mfg, "Function": func,
+                    p1_label: p1, p2_label: p2
+                }])
+                st.session_state.project_db = pd.concat([st.session_state.project_db, new_row], ignore_index=True)
+                st.success(f"Component '{pn}' added to your project database.")
+    if not st.session_state.project_db.empty:
         st.markdown("---")
-        d = st.session_state.found_component
-        html_string = f"<div class='spec-sheet'><h4>Datasheet: {d.get('part_name', 'N/A')} ({d.get('part_number', '')})</h4>"
-        display_order = ['subsystem', 'manufacturer', 'type', 'package_type', 'package', 'certifications']
-        remaining_keys = [k for k in d.keys() if k not in display_order and k not in ['part_number', 'part_name']]
-        for key in display_order + sorted(remaining_keys):
-            if key in d: html_string += f'<div class="spec-item"><span class="spec-key">{key.replace("_", " ").title()}</span> <span class="spec-value">{d[key]}</span></div>'
-        html_string += "</div>"
-        st.markdown(html_string, unsafe_allow_html=True)
-
-# --- Dashboard Module ---
-else:
-    st.subheader("Session Compliance Dashboard")
-    st.caption("A high-level overview of verification activities performed in this session.")
-    c1, c2, c3 = st.columns(3)
-    c1.metric("Reports Verified", st.session_state.reports_verified)
-    c2.metric("Requirements Generated", st.session_state.requirements_generated)
-    c3.metric("Last Report Pass Rate", st.session_state.last_pass_rate)
-
+        st.subheader("Project Component Database")
+        st.dataframe(st.session_state.project_db.astype(str))
+else: # Dashboard
+    st.header("Dashboard & Analytics")
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Reports Verified", st.session_state.reports_verified)
+    col2.metric("Requirements Generated", st.session_state.requirements_generated)
+    col3.metric("Components in DB", len(st.session_state.project_db))
