@@ -14,9 +14,9 @@ except ImportError:
     st.stop()
 
 # === Branding & Page Config ===
-st.set_page_config(page_title="PEOPLE TECH | Automotive Compliance Tool", layout="wide")
+st.set_page_config(page_title="Regulatory Compliance & Safety Tool", layout="wide")
 
-# === Advanced Prompting: Enhanced CSS for better visual cues ===
+# === Advanced CSS for Styling ===
 st.markdown("""
 <style>
 :root { --accent:#0056b3; --panel:#f3f8fc; --shadow:#cfe7ff; --pass:#1e9f50; --fail:#c43a31; --info:#7c3aed; }
@@ -46,26 +46,23 @@ def init_session_state():
             st.session_state[key] = value
 init_session_state()
 
-# === MODIFICATION: HEADER WITH NEW LOGO AND VISIBLE NAME ===
+# === MODIFICATION: Refined Header with Logo and New Title ===
 logo_col, title_col = st.columns([1, 4])
 with logo_col:
-    # Use the generated logo file name
     logo_path = "people_tech_logo.png"
     if os.path.exists(logo_path):
         st.image(logo_path, width=150)
     else:
-        st.error("Logo file not found. Please ensure 'people_tech_logo.png' is in the same directory.")
+        st.error("Logo file not found. Ensure 'people_tech_logo.png' is present.")
 with title_col:
     st.markdown("""
-        <div style="padding-top: 20px;">
-          <h1 style="color:var(--accent); font-size:2.5em; margin:0; line-height:1.1;">PEOPLE TECH</h1>
-          <p style="color:#555; margin:0; font-weight:500; font-size:1.2em;">Automotive Compliance & Safety Verification Tool</p>
+        <div style="padding-top: 10px;">
+          <h1 style="color:var(--accent); font-size:2.8em; margin:0; line-height:1.1;">Regulatory Compliance and Safety Verification Tool</h1>
         </div>
     """, unsafe_allow_html=True)
 st.markdown("---")
 
-
-# === KNOWLEDGE BASES ===
+# === KNOWLEDGE BASES (Unchanged) ===
 KEYWORD_TO_STANDARD_MAP = {
     "safety": "ISO 26262", "asil": "ISO 26262", "fusa": "ISO 26262", "cybersecurity": "ISO/SAE 21434", "tara": "ISO/SAE 21434",
     "penetration test": "ISO/SAE 21434", "ip rating": "IEC 60529", "ingress protection": "IEC 60529", "short circuit": "AIS-156 / IEC 62133",
@@ -82,7 +79,6 @@ TEST_CASE_KNOWLEDGE_BASE = {
     "cybersecurity penetration test": {"purpose": "To identify vulnerabilities in the device's external interfaces.", "requirement": "The device must resist defined attack vectors without allowing unauthorized access or modification of critical data.", "standard_reference": "ISO/SAE 21434"},
 }
 
-# === MODIFICATION: VASTLY EXPANDED E-BIKE COMPONENT DATABASE ===
 COMPONENT_KNOWLEDGE_BASE = {
     # --- VEHICLE CONTROL UNIT (VCU) ---
     "spc560p50l3": {"subsystem": "VCU", "part_name": "32-bit MCU", "manufacturer": "STMicroelectronics", "type": "Microcontroller", "package": "LQFP-100", "package_type": "SMD", "certifications": "AEC-Q100"},
@@ -107,28 +103,21 @@ COMPONENT_KNOWLEDGE_BASE = {
     "eeh-azt1v471": {"subsystem": "Charger/DC-DC", "part_name": "Hybrid Polymer Aluminum Electrolytic Capacitor", "manufacturer": "Panasonic", "type": "Electrolytic Capacitor", "capacitance": "470 µF", "voltage_rating": "35V", "esr": "20 mOhm", "package": "Radial Can", "package_type": "SMD", "certifications": "AEC-Q200"},
 }
 
-
-# === Intelligent Parser ===
+# === Core Functions (Unchanged) ===
 def intelligent_parser(text: str):
-    # This function remains the same as it effectively parses general test report formats.
     extracted_tests = []
     lines = text.split('\n')
-    for i, line in enumerate(lines):
+    for line in lines:
         line = line.strip()
         if not line: continue
-        test_data = {"TestName": "N/A", "Result": "N/A", "Standard": "N/A"}
         match = re.match(r'^(.*?)(?:\s{2,}|:)\s*(PASS|FAIL|PASSED|FAILED|SUCCESS|FAILURE)\s*$', line, re.I)
         if match:
-            test_data["TestName"] = match.group(1).strip().replace(':', '')
-            result = match.group(2).upper()
-            test_data["Result"] = "PASS" if result in ["PASS", "PASSED", "SUCCESS"] else "FAIL"
+            test_data = {"TestName": match.group(1).strip().replace(':', ''), "Result": "PASS" if match.group(2).upper() in ["PASS", "PASSED", "SUCCESS"] else "FAIL"}
+            for keyword, standard in KEYWORD_TO_STANDARD_MAP.items():
+                if keyword in test_data["TestName"].lower():
+                    test_data["Standard"] = standard
+                    break
             extracted_tests.append(test_data)
-            continue
-    for test in extracted_tests:
-        test_name_lower = test["TestName"].lower()
-        for keyword, standard in KEYWORD_TO_STANDARD_MAP.items():
-            if keyword in test_name_lower:
-                test["Standard"] = standard; break
     return extracted_tests
 
 def parse_report(uploaded_file):
@@ -151,7 +140,7 @@ def parse_report(uploaded_file):
 
 # === Sidebar & Main App Logic ===
 option = st.sidebar.radio("Navigation Menu", ("Test Report Verification", "Test Requirement Generation", "E-Bike Component Datasheet Lookup", "Compliance Dashboard"))
-st.sidebar.info("An integrated tool for E-Bike and automotive compliance, built by PEOPLE TECH.")
+st.sidebar.info("An integrated tool for automotive compliance verification.")
 
 # --- Test Report Verification Module ---
 if option == "Test Report Verification":
@@ -197,16 +186,14 @@ elif option == "Test Requirement Generation":
                     st.markdown("**Requirement:** The system shall be tested to verify performance and safety for this case, adhering to all applicable standards.")
                 st.markdown("</div>", unsafe_allow_html=True)
 
-# --- MODIFICATION: E-Bike Component Datasheet Lookup Module ---
+# --- E-Bike Component Datasheet Lookup Module ---
 elif option == "E-Bike Component Datasheet Lookup":
     st.subheader("E-Bike Component Datasheet Lookup")
     st.caption("Search the database for automotive-grade components used in VCUs, motor controllers, clusters, and chargers.")
     part_q = st.text_input("Enter Part Number", placeholder="e.g., SPC560P50L3, WSLP2512R0100FE, EEH-AZT1V471...").lower().strip().replace(" ", "")
     
     if st.button("Find Component", use_container_width=True):
-        found_data = None
-        for key, data in COMPONENT_KNOWLEDGE_BASE.items():
-            if key in part_q: found_data = {"part_number": key.upper(), **data}; break
+        found_data = next(({"part_number": key.upper(), **data} for key, data in COMPONENT_KNOWLEDGE_BASE.items() if key in part_q), None)
         st.session_state.found_component = found_data if found_data else {}
         if not found_data:
             st.warning("Component not in internal database. Use the research links below.")
