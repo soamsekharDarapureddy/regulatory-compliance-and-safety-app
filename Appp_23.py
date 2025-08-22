@@ -46,7 +46,7 @@ def init_session_state():
             st.session_state[key] = value
 init_session_state()
 
-# === MODIFICATION: Refined Header with Logo and New Title ===
+# === Refined Header ===
 logo_col, title_col = st.columns([1, 4])
 with logo_col:
     logo_path = "people_tech_logo.png"
@@ -62,9 +62,11 @@ with title_col:
     """, unsafe_allow_html=True)
 st.markdown("---")
 
-# === KNOWLEDGE BASES (Unchanged) ===
+# === KNOWLEDGE BASES ===
 KEYWORD_TO_STANDARD_MAP = {
+    # Functional Safety & Cybersecurity
     "safety": "ISO 26262", "asil": "ISO 26262", "fusa": "ISO 26262", "cybersecurity": "ISO/SAE 21434", "tara": "ISO/SAE 21434",
+    # General Automotive & E-Bike Standards
     "penetration test": "ISO/SAE 21434", "ip rating": "IEC 60529", "ingress protection": "IEC 60529", "short circuit": "AIS-156 / IEC 62133",
     "overcharge": "AIS-156 / ISO 12405-4", "over-discharge": "AIS-156 / ISO 12405-4", "vibration": "IEC 60068-2-6 / AIS-048",
     "emc": "IEC 61000 / ECE R10", "environmental": "ISO 16750", "can bus": "ISO 11898", "diagnostics": "ISO 14229 (UDS)",
@@ -103,21 +105,67 @@ COMPONENT_KNOWLEDGE_BASE = {
     "eeh-azt1v471": {"subsystem": "Charger/DC-DC", "part_name": "Hybrid Polymer Aluminum Electrolytic Capacitor", "manufacturer": "Panasonic", "type": "Electrolytic Capacitor", "capacitance": "470 µF", "voltage_rating": "35V", "esr": "20 mOhm", "package": "Radial Can", "package_type": "SMD", "certifications": "AEC-Q200"},
 }
 
-# === Core Functions (Unchanged) ===
+# === Core Parsing Functions ===
 def intelligent_parser(text: str):
     extracted_tests = []
     lines = text.split('\n')
+    
     for line in lines:
         line = line.strip()
-        if not line: continue
-        match = re.match(r'^(.*?)(?:\s{2,}|:)\s*(PASS|FAIL|PASSED|FAILED|SUCCESS|FAILURE)\s*$', line, re.I)
-        if match:
-            test_data = {"TestName": match.group(1).strip().replace(':', ''), "Result": "PASS" if match.group(2).upper() in ["PASS", "PASSED", "SUCCESS"] else "FAIL"}
-            for keyword, standard in KEYWORD_TO_STANDARD_MAP.items():
-                if keyword in test_data["TestName"].lower():
-                    test_data["Standard"] = standard
-                    break
+        if not line:
+            continue
+        test_data = {"TestName": "N/A", "Result": "N/A", "Actual": "N/A", "Standard": "N/A"}
+        
+        # Pattern 1: `Name --> Result --> Value`
+        match1 = re.match(r'^(.*?)\s*-->\s*(Passed|Failed|Success)\s*-->\s*(.+)$', line, re.I)
+        if match1:
+            test_data["TestName"] = match1.group(1).strip()
+            result_str = match1.group(2).lower()
+            test_data["Result"] = "PASS" if "passed" in result_str or "success" in result_str else "FAIL"
+            test_data["Actual"] = match1.group(3).strip()
             extracted_tests.append(test_data)
+            continue
+            
+        # Pattern 2: `Name --> Result`
+        match2 = re.match(r'^(.*?)\s*-->\s*(.+)$', line, re.I)
+        if match2:
+            test_data["TestName"] = match2.group(1).strip()
+            result_str = match2.group(2).lower()
+            if "passed" in result_str or "success" in result_str:
+                test_data["Result"] = "PASS"
+            elif "failed" in result_str:
+                test_data["Result"] = "FAIL"
+            else:
+                test_data["Result"] = "INFO"
+            test_data["Actual"] = match2.group(2).strip()
+            extracted_tests.append(test_data)
+            continue
+            
+        # Pattern 3: Simple `Test Name is Success/Failure`
+        match3 = re.match(r'^(.+?)\s+is\s+(success|failure|passed|failed)$', line, re.I)
+        if match3:
+            test_data["TestName"] = match3.group(1).strip()
+            result_str = match3.group(2).lower()
+            test_data["Result"] = "PASS" if "success" in result_str or "passed" in result_str else "FAIL"
+            extracted_tests.append(test_data)
+            continue
+
+        # Pattern 4: Simple `Test Name Failed` or `Test Name Passed`
+        match4 = re.match(r'^(.+?)\s+(Failed|Passed)$', line, re.I)
+        if match4:
+            test_data["TestName"] = match4.group(1).strip()
+            test_data["Result"] = "PASS" if "passed" in match4.group(2).lower() else "FAIL"
+            extracted_tests.append(test_data)
+            continue
+
+    # Associate known standards using the keyword map
+    for test in extracted_tests:
+        test_name_lower = test["TestName"].lower()
+        for keyword, standard in KEYWORD_TO_STANDARD_MAP.items():
+            if keyword in test_name_lower:
+                test["Standard"] = standard
+                break
+                
     return extracted_tests
 
 def parse_report(uploaded_file):
@@ -127,16 +175,22 @@ def parse_report(uploaded_file):
             return pd.read_csv(uploaded_file, on_bad_lines='skip').to_dict(orient="records")
         elif uploaded_file.name.lower().endswith(('.xlsx', '.xls')):
             return pd.read_excel(uploaded_file).to_dict(orient="records")
+        
         content = ""
         if uploaded_file.type == "application/pdf":
-            with pdfplumber.open(uploaded_file) as pdf: content = "\n".join(page.extract_text() or "" for page in pdf.pages)
+            with pdfplumber.open(uploaded_file) as pdf:
+                content = "\n".join(page.extract_text() or "" for page in pdf.pages)
         elif uploaded_file.type in ("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/msword"):
-            doc = docx.Document(uploaded_file); content = "\n".join(p.text for p in doc.paragraphs if p.text)
+            doc = docx.Document(uploaded_file)
+            content = "\n".join(p.text for p in doc.paragraphs if p.text)
         else:
-            st.error(f"Unsupported text file type: {uploaded_file.type}"); return []
+            st.error(f"Unsupported file type for text extraction: {uploaded_file.type}")
+            return []
+        
         return intelligent_parser(content)
     except Exception as e:
-        st.error(f"An error occurred while parsing the file: {e}"); return []
+        st.error(f"An error occurred while parsing the file: {e}")
+        return []
 
 # === Sidebar & Main App Logic ===
 option = st.sidebar.radio("Navigation Menu", ("Test Report Verification", "Test Requirement Generation", "E-Bike Component Datasheet Lookup", "Compliance Dashboard"))
@@ -153,16 +207,37 @@ if option == "Test Report Verification":
             st.session_state.reports_verified += 1
             failed_tests = [t for t in parsed_data if str(t.get("Result", "")).upper() == "FAIL"]
             passed_tests = [t for t in parsed_data if str(t.get("Result", "")).upper() == "PASS"]
-            total_tests = len(failed_tests) + len(passed_tests)
-            if total_tests > 0: st.session_state.last_pass_rate = f"{(len(passed_tests) / total_tests) * 100:.1f}%"
+            other_tests = [t for t in parsed_data if str(t.get("Result", "")).upper() not in ["PASS", "FAIL"]]
+            
+            total_classified = len(failed_tests) + len(passed_tests)
+            if total_classified > 0: st.session_state.last_pass_rate = f"{(len(passed_tests) / total_classified) * 100:.1f}%"
+            
             st.metric("Compliance Pass Rate", st.session_state.last_pass_rate, delta=f"{len(failed_tests)} Failures", delta_color="inverse")
+            
             col1, col2 = st.columns(2)
             with col1:
                 st.markdown(f"<h4 style='color:var(--pass);'>✅ {len(passed_tests)} Passed Cases</h4>", unsafe_allow_html=True)
-                for t in passed_tests: st.markdown(f"<div class='card card-pass'><b>Test:</b> {t.get('TestName', 'N/A')}<br><b>Standard:</b> {t.get('Standard', 'N/A')}</div>", unsafe_allow_html=True)
+                for t in passed_tests:
+                    st.markdown(f"<div class='card card-pass'>"
+                                f"<b>Test:</b> {t.get('TestName', 'N/A')}<br>"
+                                f"<b>Standard:</b> {t.get('Standard', 'N/A')}<br>"
+                                f"<b>Actual/Value:</b> {t.get('Actual', 'N/A')}"
+                                f"</div>", unsafe_allow_html=True)
             with col2:
                 st.markdown(f"<h4 style='color:var(--fail);'>🔴 {len(failed_tests)} FAILED Cases</h4>", unsafe_allow_html=True)
-                for t in failed_tests: st.markdown(f"<div class='card card-fail'><b>Test:</b> {t.get('TestName', 'N/A')}<br><b>Standard:</b> {t.get('Standard', 'N/A')}</div>", unsafe_allow_html=True)
+                for t in failed_tests:
+                    st.markdown(f"<div class='card card-fail'>"
+                                f"<b>Test:</b> {t.get('TestName', 'N/A')}<br>"
+                                f"<b>Standard:</b> {t.get('Standard', 'N/A')}<br>"
+                                f"<b>Actual/Value:</b> {t.get('Actual', 'N/A')}"
+                                f"</div>", unsafe_allow_html=True)
+            if other_tests:
+                with st.expander(f"View {len(other_tests)} Other/Informational Items"):
+                    for t in other_tests:
+                        st.markdown(f"<div class='card card-info'>"
+                                    f"<b>Item:</b> {t.get('TestName', 'N/A')}<br>"
+                                    f"<b>Info:</b> {t.get('Actual', 'N/A')}"
+                                    f"</div>", unsafe_allow_html=True)
         else:
             st.warning("No recognizable test data was extracted. The document may be image-based or have a non-standard format.")
 
