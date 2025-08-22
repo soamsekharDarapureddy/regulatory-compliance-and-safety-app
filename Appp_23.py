@@ -86,14 +86,13 @@ COMPONENT_KNOWLEDGE_BASE = {
     "eeh-azt1v471": {"subsystem": "Charger/DC-DC", "part_name": "Hybrid Polymer Aluminum Electrolytic Capacitor", "manufacturer": "Panasonic", "type": "Electrolytic Capacitor", "capacitance": "470 µF", "voltage_rating": "35V", "esr": "20 mOhm", "package": "Radial Can", "package_type": "SMD", "certifications": "AEC-Q200"},
 }
 
-# === MODIFICATION: New Advanced Parser for Specific Log Format ===
+# === Advanced Parser for Complex Log Formats ===
 def intelligent_parser(text: str):
     extracted_tests = []
     lines = text.split('\n')
 
     for line in lines:
         line = line.strip()
-        # Ignore empty lines and report headers/footers
         if not line or line.startswith('***') or "Report Generated Date & Time" in line:
             continue
 
@@ -193,11 +192,6 @@ def intelligent_parser(text: str):
 def parse_report(uploaded_file):
     if not uploaded_file: return []
     try:
-        # For structured files like CSV/XLSX, a different parsing strategy might be needed.
-        # This implementation focuses on parsing the text content.
-        if uploaded_file.name.lower().endswith(('.csv', '.xlsx', '.xls')):
-            st.info("Parsing structured files like CSV/XLSX as text. For best results, use text-based log files or PDF reports.")
-        
         # All files are read as text and passed to the intelligent parser
         content = uploaded_file.getvalue().decode('utf-8', errors='ignore')
         return intelligent_parser(content)
@@ -263,8 +257,18 @@ elif option == "Test Requirement Generation":
     default_cases = "Over-voltage protection test\nIP67 ingress test for VCU\nMotor controller functional safety check"
     text = st.text_area("Enter test descriptions (one per line):", default_cases, height=120)
     if st.button("Generate Requirements"):
-        # This module's logic is self-contained and correct.
-        pass
+        test_cases = [l.strip() for l in text.split("\n") if l.strip()]
+        if test_cases:
+            st.session_state.requirements_generated += len(test_cases)
+            st.markdown("### Generated Test Requirements")
+            for i, case in enumerate(test_cases):
+                found_req = next((info for key, info in TEST_CASE_KNOWLEDGE_BASE.items() if all(word in case.lower() for word in key.split())), None)
+                st.markdown(f"<div class='card card-info'><h5>REQ-{i+1:03d}: {case.title()}</h5>", unsafe_allow_html=True)
+                if found_req:
+                    st.markdown(f"**Purpose:** {found_req['purpose']}<br>**Requirement:** {found_req['requirement']}<br>**Standard:** {found_req['standard_reference']}", unsafe_allow_html=True)
+                else:
+                    st.markdown("**Requirement:** The system shall be tested to verify performance and safety for this case, adhering to all applicable standards.")
+                st.markdown("</div>", unsafe_allow_html=True)
 
 # --- E-Bike Component Datasheet Lookup Module ---
 elif option == "E-Bike Component Datasheet Lookup":
@@ -273,8 +277,26 @@ elif option == "E-Bike Component Datasheet Lookup":
     part_q = st.text_input("Enter Part Number", placeholder="e.g., SPC560P50L3, WSLP2512R0100FE...").lower().strip().replace(" ", "")
     
     if st.button("Find Component", use_container_width=True):
-        # This module's logic is self-contained and correct.
-        pass
+        found_data = next(({"part_number": key.upper(), **data} for key, data in COMPONENT_KNOWLEDGE_BASE.items() if key in part_q), None)
+        st.session_state.found_component = found_data if found_data else {}
+        if not found_data:
+            st.warning("Component not in internal database. Use the research links below.")
+            if part_q:
+                c1, c2, c3 = st.columns(3)
+                c1.link_button("Octopart", f"https://octopart.com/search?q={part_q}", use_container_width=True)
+                c2.link_button("Digi-Key", f"https://www.digikey.com/en/products/result?s={part_q}", use_container_width=True)
+                c3.link_button("Google", f"https://www.google.com/search?q={part_q}+datasheet", use_container_width=True)
+
+    if st.session_state.found_component:
+        st.markdown("---")
+        d = st.session_state.found_component
+        html_string = f"<div class='spec-sheet'><h4>Datasheet: {d.get('part_name', 'N/A')} ({d.get('part_number', '')})</h4>"
+        display_order = ['subsystem', 'manufacturer', 'type', 'package_type', 'package', 'certifications']
+        remaining_keys = [k for k in d.keys() if k not in display_order and k not in ['part_number', 'part_name']]
+        for key in display_order + sorted(remaining_keys):
+            if key in d: html_string += f'<div class="spec-item"><span class="spec-key">{key.replace("_", " ").title()}</span> <span class="spec-value">{d[key]}</span></div>'
+        html_string += "</div>"
+        st.markdown(html_string, unsafe_allow_html=True)
 
 # --- Dashboard Module ---
 else:
