@@ -56,7 +56,7 @@ with title_col:
     """, unsafe_allow_html=True)
 st.markdown("<br>", unsafe_allow_html=True)
 
-# === MODIFICATION: Using the new Knowledge Bases and Parsing Logic from your code ===
+# === KNOWLEDGE BASES ===
 KEYWORD_TO_STANDARD_MAP = {
     # Connectivity
     "gps": "NMEA 0183 / GNSS Performance Standards", "gnss": "3GPP / GNSS Performance Standards",
@@ -85,10 +85,45 @@ TEST_CASE_KNOWLEDGE_BASE = {
     "frame fatigue": {"requirement": "Frame must survive specified cyclic loads per ISO 4210.", "equipment": ["Fatigue Test Rig", "Strain Gauges"]},
 }
 for k, v in list(TEST_CASE_KNOWLEDGE_BASE.items()): TEST_CASE_KNOWLEDGE_BASE[k + " test"] = v
+
+# --- CORRECTION: Fully Restored Component Database ---
 COMPONENT_KNOWLEDGE_BASE = {
-    "bq76952": {"manufacturer": "Texas Instruments", "function": "Battery Monitor IC", "voltage": "Up to 80V"},
-    "irfb4110": {"manufacturer": "Infineon", "function": "N‑MOSFET", "voltage": "100V", "current": "180A"},
-    "1n4007": {"manufacturer": "Generic", "function": "Rectifier Diode", "voltage": "1000V", "current": "1A"},
+    # --- E-BIKE: VEHICLE CONTROL UNIT (VCU) ---
+    "spc560p50l3": {"subsystem": "VCU", "part_name": "32-bit MCU", "manufacturer": "STMicroelectronics", "type": "Microcontroller", "package": "LQFP-100", "package_type": "SMD", "certifications": "AEC-Q100"},
+    "tja1051t": {"subsystem": "VCU", "part_name": "High-speed CAN Transceiver", "manufacturer": "NXP", "type": "Transceiver", "package": "SOIC-8", "package_type": "SMD", "certifications": "AEC-Q100"},
+    "tle4275g": {"subsystem": "VCU", "part_name": "5V Low Dropout Voltage Regulator", "manufacturer": "Infineon", "type": "LDO Regulator", "output_voltage": "5V", "output_current": "400mA", "package": "DSO-14", "package_type": "SMD", "certifications": "AEC-Q100"},
+
+    # --- E-BIKE: MOTOR CONTROLLER ---
+    "fsbb30ch60f": {"subsystem": "Motor Controller", "part_name": "Smart Power Module (SPM)", "manufacturer": "ON Semiconductor", "type": "IGBT Module", "voltage_rating": "600V", "current_rating": "30A", "package": "SPM27-FA", "package_type": "Through-Hole", "certifications": "Industrial"},
+    "l6390d": {"subsystem": "Motor Controller", "part_name": "High-voltage Gate Driver", "manufacturer": "STMicroelectronics", "type": "Gate Driver", "operating_voltage": "Up to 600V", "package": "SOIC-16", "package_type": "SMD", "certifications": "Industrial"},
+    "wslp2512r0100fe": {"subsystem": "Motor Controller", "part_name": "Current Sense Shunt Resistor", "manufacturer": "Vishay", "type": "Resistor", "resistance": "10 mOhm", "tolerance": "1%", "power_rating": "1W", "package": "2512", "package_type": "SMD", "certifications": "AEC-Q200"},
+    "mkl-10uf-100v": {"subsystem": "Motor Controller", "part_name": "Metallized Polyester Film Capacitor", "manufacturer": "WIMA", "type": "Film Capacitor", "capacitance": "10 µF", "voltage_rating": "100V", "package": "Radial", "package_type": "Through-Hole", "certifications": "Industrial"},
+
+    # --- E-BIKE: INSTRUMENT CLUSTER ---
+    "mb9df125": {"subsystem": "Instrument Cluster", "part_name": "32-bit MCU with Graphics", "manufacturer": "Spansion (Cypress)", "type": "Microcontroller", "package": "LQFP-120", "package_type": "SMD", "certifications": "AEC-Q100"},
+    "is31fl3236": {"subsystem": "Instrument Cluster", "part_name": "36-Channel LED Driver", "manufacturer": "ISSI", "type": "LED Driver", "package": "QFN-48", "package_type": "SMD", "certifications": "AEC-Q100"},
+    "ac0603fr-0710kl": {"subsystem": "Instrument Cluster", "part_name": "Thick Film Chip Resistor", "manufacturer": "Yageo", "type": "Resistor", "resistance": "10 kOhm", "tolerance": "1%", "power_rating": "0.1W", "package": "0603", "package_type": "SMD", "certifications": "AEC-Q200"},
+    "cc0805krx7r9bb104": {"subsystem": "Instrument Cluster", "part_name": "Multilayer Ceramic Capacitor (MLCC)", "manufacturer": "Yageo", "type": "MLCC Capacitor", "capacitance": "100 nF (0.1 µF)", "voltage_rating": "50V", "dielectric": "X7R", "package": "0805", "package_type": "SMD", "certifications": "AEC-Q200"},
+
+    # --- E-BIKE: CHARGER & DC-DC CONVERTER ---
+    "uc3843bd1g": {"subsystem": "Charger/DC-DC", "part_name": "Current-Mode PWM Controller", "manufacturer": "ON Semiconductor", "type": "PWM Controller IC", "package": "SOIC-8", "package_type": "SMD", "certifications": "AEC-Q100"},
+    "irfr3709z": {"subsystem": "Charger/DC-DC", "part_name": "N-Channel Power MOSFET", "manufacturer": "Infineon", "type": "MOSFET", "drain_source_voltage_vdss": "30V", "on_resistance_rds_on": "6.5 mOhm", "package": "DPAK", "package_type": "SMD", "certifications": "AEC-Q101"},
+    "eeh-azt1v471": {"subsystem": "Charger/DC-DC", "part_name": "Hybrid Polymer Aluminum Electrolytic Capacitor", "manufacturer": "Panasonic", "type": "Electrolytic Capacitor", "capacitance": "470 µF", "voltage_rating": "35V", "esr": "20 mOhm", "package": "Radial Can", "package_type": "SMD", "certifications": "AEC-Q200"},
+    
+    # --- GENERAL-PURPOSE AUTOMOTIVE & INDUSTRIAL COMPONENTS ---
+    # Regulators
+    "lm7805": {"subsystem": "General", "part_name": "Positive Voltage Regulator", "manufacturer": "Texas Instruments", "type": "Linear Regulator", "output_voltage": "5V", "input_voltage": "7V to 35V", "package": "TO-220", "package_type": "Through-Hole", "certifications": "Industrial"},
+    "lm1117": {"subsystem": "General", "part_name": "Low Dropout Positive Voltage Regulator", "manufacturer": "ON Semiconductor", "type": "LDO Regulator", "output_voltage": "3.3V (Adjustable)", "package": "SOT-223", "package_type": "SMD", "certifications": "Industrial"},
+    "lm2596": {"subsystem": "General", "part_name": "Step-Down Voltage Regulator", "manufacturer": "Texas Instruments", "type": "Switching Regulator", "output_voltage": "1.2V to 37V", "package": "TO-263", "package_type": "SMD", "certifications": "Industrial"},
+    # MOSFETs
+    "irfz44n": {"subsystem": "General", "part_name": "N-Channel Power MOSFET", "manufacturer": "Infineon", "type": "MOSFET", "drain_source_voltage_vdss": "55V", "package": "TO-220AB", "package_type": "Through-Hole", "certifications": "Industrial"},
+    "bss138": {"subsystem": "General", "part_name": "N-Channel Logic Level MOSFET", "manufacturer": "NXP", "type": "MOSFET", "drain_source_voltage_vdss": "50V", "package": "SOT-23", "package_type": "SMD", "certifications": "AEC-Q101"},
+    # ICs
+    "lm358": {"subsystem": "General", "part_name": "Dual General-Purpose Op-Amp", "manufacturer": "Texas Instruments", "type": "Op-Amp", "supply_voltage": "3V to 32V", "package": "SOIC-8", "package_type": "SMD", "certifications": "Industrial/AEC-Q100 versions"},
+    "stm32f407": {"subsystem": "General", "part_name": "ARM Cortex-M4 MCU", "manufacturer": "STMicroelectronics", "type": "MCU", "flash_memory": "1MB", "package": "LQFP144", "package_type": "SMD", "certifications": "Industrial"},
+    # Diodes
+    "1n4007": {"subsystem": "General", "part_name": "General Purpose Rectifier Diode", "manufacturer": "Multiple", "type": "Diode", "peak_reverse_voltage": "1000V", "package": "DO-41", "package_type": "Through-Hole", "certifications": "Industrial"},
+    "us1m": {"subsystem": "General", "part_name": "Ultrafast Surface-Mount Rectifier", "manufacturer": "Vishay", "type": "Diode", "peak_reverse_voltage": "1000V", "package": "SMA (DO-214AC)", "package_type": "SMD", "certifications": "AEC-Q101"},
 }
 
 def intelligent_parser(text: str):
@@ -290,11 +325,13 @@ elif option == "Component Information":
     st.subheader("Key Component Information", anchor=False)
     st.caption("Look up parts in the internal database or use web search shortcuts.")
     
-    part_q = st.text_input("Quick Lookup (part number)", placeholder="e.g., IRFB4110").lower().strip()
+    part_q = st.text_input("Quick Lookup (part number)", placeholder="e.g., spc560p50l3, irfz44n...").lower().strip()
     if st.button("Find Component"):
-        found = next((v for k, v in COMPONENT_KNOWLEDGE_BASE.items() if k in part_q), None)
-        if found:
-            st.success(f"Found: {part_q.upper()}. Details populated in the form below.")
+        # Search the comprehensive database
+        found_key = next((k for k in COMPONENT_KNOWLEDGE_BASE if k in part_q), None)
+        if found_key:
+            found = COMPONENT_KNOWLEDGE_BASE[found_key]
+            st.success(f"Found: {part_q.upper()}. Details populated below.")
             st.session_state.found_component = {"part_number": part_q.upper(), **found}
         else:
             st.session_state.found_component = {}
@@ -304,7 +341,7 @@ elif option == "Component Information":
                 c1.link_button("Octopart", f"https://octopart.com/search?q={part_q}")
                 c2.link_button("Digi-Key", f"https://www.digikey.com/en/products/result?s={part_q}")
                 c3.link_button("Mouser", f"https://www.mouser.com/Search/Refine?Keyword={part_q}")
-                c4.link_button("Wikipedia", f"https://en.wikipedia.org/wiki/Special:Search?search={part_q}")
+                c4.link_button("Google", f"https://www.google.com/search?q={part_q}+datasheet")
                 
     st.markdown("---")
     
@@ -313,13 +350,13 @@ elif option == "Component Information":
         st.markdown("### Add Component to Database")
         pn = st.text_input("Part Number", value=d.get("part_number", ""))
         mfg = st.text_input("Manufacturer", value=d.get("manufacturer", ""))
-        func = st.text_input("Function", value=d.get("function", ""))
-        val1 = st.text_input("Voltage/Value", value=d.get("voltage", d.get("value", "")))
-        notes = st.text_area("Notes (e.g., certifications)")
+        func = st.text_input("Function / Part Name", value=d.get("part_name", d.get("function", "")))
+        val1 = st.text_input("Key Spec (e.g., Voltage, Resistance)", value=d.get("output_voltage", d.get("voltage_rating", "")))
+        notes = st.text_area("Notes (e.g., certifications, package)", value=d.get("certifications", ""))
         
         if st.form_submit_button("Add Component"):
             if pn:
-                new_row = pd.DataFrame([{"Part Number": pn, "Manufacturer": mfg, "Function": func, "Voltage/Value": val1, "Notes": notes}])
+                new_row = pd.DataFrame([{"Part Number": pn, "Manufacturer": mfg, "Function": func, "Key Spec": val1, "Notes": notes}])
                 st.session_state.component_db = pd.concat([st.session_state.component_db, new_row], ignore_index=True)
                 st.success(f"Component '{pn}' added to the database.")
                 st.session_state.found_component = {}
