@@ -43,7 +43,7 @@ def init_session_state():
             st.session_state[key] = value
 init_session_state()
 
-# === FINAL HEADER ===
+# === FINAL HEADER with visual adjustments ===
 def get_image_as_base64(path):
     if os.path.exists(path):
         with open(path, "rb") as img_file:
@@ -54,11 +54,11 @@ logo_base64 = get_image_as_base64("people_tech_logo.png")
 
 if logo_base64:
     st.markdown(f"""
-        <div style="display: flex; align-items: center; margin-bottom: 20px;">
-            <img src="data:image/png;base64,{logo_base64}" alt="Logo" style="height: 80px; margin-right: 20px;"/>
+        <div style="display: flex; align-items: center; margin-bottom: 25px;">
+            <img src="data:image/png;base64,{logo_base64}" alt="Logo" style="height: 100px; margin-right: 25px;"/>
             <div>
-                <h1 style="color:#0056b3; margin: 0; font-size: 2.8em; line-height: 1;">Regulatory Compliance</h1>
-                <h2 style="color:#0056b3; margin: 0; font-size: 1.8em; line-height: 1;">& Safety Verification Tool</h2>
+                <h1 style="color:#0056b3; margin: 0; font-size: 2.5em; line-height: 1.1;">Regulatory Compliance</h1>
+                <h2 style="color:#0056b3; margin: 0; font-size: 1.6em; line-height: 1.1;">& Safety Verification Tool</h2>
             </div>
         </div>
     """, unsafe_allow_html=True)
@@ -97,43 +97,42 @@ TEST_CASE_KNOWLEDGE_BASE = {
 }
 for k, v in list(TEST_CASE_KNOWLEDGE_BASE.items()): TEST_CASE_KNOWLEDGE_BASE[k + " test"] = v
 
-# --- CORRECTION: Fully Restored Component Database ---
+# --- DEFINITIVE, FULLY RESTORED AND EXPANDED COMPONENT DATABASE ---
 COMPONENT_KNOWLEDGE_BASE = {
-    # --- E-BIKE: VEHICLE CONTROL UNIT (VCU) ---
-    "spc560p50l3": {"subsystem": "VCU", "part_name": "32-bit MCU", "manufacturer": "STMicroelectronics", "type": "Microcontroller", "package": "LQFP-100", "package_type": "SMD", "certifications": "AEC-Q100"},
-    "tja1051t": {"subsystem": "VCU", "part_name": "High-speed CAN Transceiver", "manufacturer": "NXP", "type": "Transceiver", "package": "SOIC-8", "package_type": "SMD", "certifications": "AEC-Q100"},
-    "tle4275g": {"subsystem": "VCU", "part_name": "5V Low Dropout Voltage Regulator", "manufacturer": "Infineon", "type": "LDO Regulator", "output_voltage": "5V", "output_current": "400mA", "package": "DSO-14", "package_type": "SMD", "certifications": "AEC-Q100"},
-
-    # --- E-BIKE: MOTOR CONTROLLER ---
-    "fsbb30ch60f": {"subsystem": "Motor Controller", "part_name": "Smart Power Module (SPM)", "manufacturer": "ON Semiconductor", "type": "IGBT Module", "voltage_rating": "600V", "current_rating": "30A", "package": "SPM27-FA", "package_type": "Through-Hole", "certifications": "Industrial"},
-    "l6390d": {"subsystem": "Motor Controller", "part_name": "High-voltage Gate Driver", "manufacturer": "STMicroelectronics", "type": "Gate Driver", "operating_voltage": "Up to 600V", "package": "SOIC-16", "package_type": "SMD", "certifications": "Industrial"},
-    "wslp2512r0100fe": {"subsystem": "Motor Controller", "part_name": "Current Sense Shunt Resistor", "manufacturer": "Vishay", "type": "Resistor", "resistance": "10 mOhm", "tolerance": "1%", "power_rating": "1W", "package": "2512", "package_type": "SMD", "certifications": "AEC-Q200"},
-    "mkl-10uf-100v": {"subsystem": "Motor Controller", "part_name": "Metallized Polyester Film Capacitor", "manufacturer": "WIMA", "type": "Film Capacitor", "capacitance": "10 µF", "voltage_rating": "100V", "package": "Radial", "package_type": "Through-Hole", "certifications": "Industrial"},
-
-    # --- E-BIKE: INSTRUMENT CLUSTER ---
-    "mb9df125": {"subsystem": "Instrument Cluster", "part_name": "32-bit MCU with Graphics", "manufacturer": "Spansion (Cypress)", "type": "Microcontroller", "package": "LQFP-120", "package_type": "SMD", "certifications": "AEC-Q100"},
-    "is31fl3236": {"subsystem": "Instrument Cluster", "part_name": "36-Channel LED Driver", "manufacturer": "ISSI", "type": "LED Driver", "package": "QFN-48", "package_type": "SMD", "certifications": "AEC-Q100"},
-    "ac0603fr-0710kl": {"subsystem": "Instrument Cluster", "part_name": "Thick Film Chip Resistor", "manufacturer": "Yageo", "type": "Resistor", "resistance": "10 kOhm", "tolerance": "1%", "power_rating": "0.1W", "package": "0603", "package_type": "SMD", "certifications": "AEC-Q200"},
-    "cc0805krx7r9bb104": {"subsystem": "Instrument Cluster", "part_name": "Multilayer Ceramic Capacitor (MLCC)", "manufacturer": "Yageo", "type": "MLCC Capacitor", "capacitance": "100 nF (0.1 µF)", "voltage_rating": "50V", "dielectric": "X7R", "package": "0805", "package_type": "SMD", "certifications": "AEC-Q200"},
-
-    # --- E-BIKE: CHARGER & DC-DC CONVERTER ---
-    "uc3843bd1g": {"subsystem": "Charger/DC-DC", "part_name": "Current-Mode PWM Controller", "manufacturer": "ON Semiconductor", "type": "PWM Controller IC", "package": "SOIC-8", "package_type": "SMD", "certifications": "AEC-Q100"},
-    "irfr3709z": {"subsystem": "Charger/DC-DC", "part_name": "N-Channel Power MOSFET", "manufacturer": "Infineon", "type": "MOSFET", "drain_source_voltage_vdss": "30V", "on_resistance_rds_on": "6.5 mOhm", "package": "DPAK", "package_type": "SMD", "certifications": "AEC-Q101"},
-    "eeh-azt1v471": {"subsystem": "Charger/DC-DC", "part_name": "Hybrid Polymer Aluminum Electrolytic Capacitor", "manufacturer": "Panasonic", "type": "Electrolytic Capacitor", "capacitance": "470 µF", "voltage_rating": "35V", "esr": "20 mOhm", "package": "Radial Can", "package_type": "SMD", "certifications": "AEC-Q200"},
+    # Original E-Bike Systems Components
+    "spc560p50l3": {"subsystem": "VCU", "part_name": "32-bit MCU", "manufacturer": "STMicroelectronics", "certifications": "AEC-Q100"},
+    "tja1051t": {"subsystem": "VCU", "part_name": "High-speed CAN Transceiver", "manufacturer": "NXP", "certifications": "AEC-Q100"},
+    "tle4275g": {"subsystem": "VCU", "part_name": "5V LDO Regulator", "manufacturer": "Infineon", "certifications": "AEC-Q100"},
+    "fsbb30ch60f": {"subsystem": "Motor Controller", "part_name": "SPM IGBT Module", "manufacturer": "ON Semi", "voltage": "600V"},
+    "wslp2512r0100fe": {"subsystem": "Motor Controller", "part_name": "Current Sense Resistor", "manufacturer": "Vishay", "certifications": "AEC-Q200"},
+    "mb9df125": {"subsystem": "Instrument Cluster", "part_name": "MCU with Graphics", "manufacturer": "Spansion (Cypress)", "certifications": "AEC-Q100"},
+    "uc3843bd1g": {"subsystem": "Charger/DC-DC", "part_name": "PWM Controller", "manufacturer": "ON Semi", "certifications": "AEC-Q100"},
+    "eeh-azt1v471": {"subsystem": "Charger/DC-DC", "part_name": "Hybrid Polymer Capacitor", "manufacturer": "Panasonic", "certifications": "AEC-Q200"},
+    "bq76952": {"subsystem": "BMS", "part_name": "16-Series Battery Monitor", "manufacturer": "Texas Instruments", "voltage": "Up to 80V"},
     
-    # --- GENERAL-PURPOSE AUTOMOTIVE & INDUSTRIAL COMPONENTS ---
-    "lm7805": {"subsystem": "General", "part_name": "Positive Voltage Regulator", "manufacturer": "Texas Instruments", "type": "Linear Regulator", "output_voltage": "5V", "input_voltage": "7V to 35V", "package": "TO-220", "package_type": "Through-Hole", "certifications": "Industrial"},
-    "lm1117": {"subsystem": "General", "part_name": "Low Dropout Positive Voltage Regulator", "manufacturer": "ON Semiconductor", "type": "LDO Regulator", "output_voltage": "3.3V (Adjustable)", "package": "SOT-223", "package_type": "SMD", "certifications": "Industrial"},
-    "lm2596": {"subsystem": "General", "part_name": "Step-Down Voltage Regulator", "manufacturer": "Texas Instruments", "type": "Switching Regulator", "output_voltage": "1.2V to 37V", "package": "TO-263", "package_type": "SMD", "certifications": "Industrial"},
-    "irfz44n": {"subsystem": "General", "part_name": "N-Channel Power MOSFET", "manufacturer": "Infineon", "type": "MOSFET", "drain_source_voltage_vdss": "55V", "package": "TO-220AB", "package_type": "Through-Hole", "certifications": "Industrial"},
-    "bss138": {"subsystem": "General", "part_name": "N-Channel Logic Level MOSFET", "manufacturer": "NXP", "type": "MOSFET", "drain_source_voltage_vdss": "50V", "package": "SOT-23", "package_type": "SMD", "certifications": "AEC-Q101"},
-    "lm358": {"subsystem": "General", "part_name": "Dual General-Purpose Op-Amp", "manufacturer": "Texas Instruments", "type": "Op-Amp", "supply_voltage": "3V to 32V", "package": "SOIC-8", "package_type": "SMD", "certifications": "Industrial/AEC-Q100 versions"},
-    "stm32f407": {"subsystem": "General", "part_name": "ARM Cortex-M4 MCU", "manufacturer": "STMicroelectronics", "type": "MCU", "flash_memory": "1MB", "package": "LQFP144", "package_type": "SMD", "certifications": "Industrial"},
-    "1n4007": {"subsystem": "General", "part_name": "General Purpose Rectifier Diode", "manufacturer": "Multiple", "type": "Diode", "peak_reverse_voltage": "1000V", "package": "DO-41", "package_type": "Through-Hole", "certifications": "Industrial"},
-    "us1m": {"subsystem": "General", "part_name": "Ultrafast Surface-Mount Rectifier", "manufacturer": "Vishay", "type": "Diode", "peak_reverse_voltage": "1000V", "package": "SMA (DO-214AC)", "package_type": "SMD", "certifications": "AEC-Q101"},
-    "bq76952": {"manufacturer": "Texas Instruments", "function": "Battery Monitor IC", "voltage": "Up to 80V"},
+    # Original General Purpose Components
+    "lm7805": {"subsystem": "General", "part_name": "5V Regulator", "manufacturer": "TI"},
+    "irfz44n": {"subsystem": "General", "part_name": "N-Channel MOSFET", "manufacturer": "Infineon"},
+    "stm32f407": {"subsystem": "General", "part_name": "ARM Cortex-M4 MCU", "manufacturer": "STMicroelectronics"},
+    "1n4007": {"subsystem": "General", "part_name": "Rectifier Diode", "manufacturer": "Multiple"},
     "irfb4110": {"manufacturer": "Infineon", "function": "N‑MOSFET", "voltage": "100V", "current": "180A"},
+
+    # New Components from ALS_2.0_BOM_12Nov24.xlsx
+    "grt188c81a106me13d": {"subsystem": "ALS Board", "part_name": "10uF Capacitor", "manufacturer": "Murata", "footprint": "C0603"},
+    "gcm155l81e104ke02d": {"subsystem": "ALS Board", "part_name": "0.1uF Capacitor", "manufacturer": "Samsung", "footprint": "C0402"},
+    "5019530507": {"subsystem": "ALS Board", "part_name": "5-Pin Header", "manufacturer": "Molex"},
+    "rt0603fre0710rl": {"subsystem": "ALS Board", "part_name": "10 Ohm Resistor", "manufacturer": "YAGEO", "footprint": "R0603"},
+    "veml6031x00": {"subsystem": "ALS Board", "part_name": "Ambient Light Sensor", "manufacturer": "Vishay"},
+
+    # New Components from VIC-Assembly-Module-0127000_1.0.4.pdf
+    "01270019-00": {"subsystem": "VIC Module", "part_name": "ANTENNA GPS", "manufacturer": "Unknown"},
+    "01270020-00": {"subsystem": "VIC Module", "part_name": "ANTENNA WIFI", "manufacturer": "Unknown"},
+    "01270021-00": {"subsystem": "VIC Module", "part_name": "ANTENNA LTE", "manufacturer": "Unknown"},
+    "p0024-03": {"subsystem": "VIC Module", "part_name": "PCBA BOARD", "manufacturer": "Unknown"},
+    "01270018-00": {"subsystem": "VIC Module", "part_name": "SENSOR ALS-PCBA", "manufacturer": "Unknown"},
+    "01270010-02": {"subsystem": "VIC Module", "part_name": "TFT LCD WITH COVER GLASS", "manufacturer": "Unknown"},
 }
+
 
 def intelligent_parser(text: str):
     extracted_tests = []
@@ -141,90 +140,98 @@ def intelligent_parser(text: str):
     
     for line in lines:
         line = line.strip()
-        if not line:
-            continue
+        if not line: continue
         test_data = {"TestName": "N/A", "Result": "N/A", "Actual": "N/A", "Standard": "N/A"}
         
-        # CORRECTED REGEX: Using raw strings (r"...") to handle backslashes correctly.
-        match1 = re.match(r'^(.*?)\s*-->\s*(Passed|Failed|Success)\s*-->\s*(.+)$', line, re.I)
-        if match1:
-            test_data["TestName"] = match1.group(1).strip()
-            result_str = match1.group(2).lower()
-            test_data["Result"] = "PASS" if "passed" in result_str or "success" in result_str else "FAIL"
-            test_data["Actual"] = match1.group(3).strip()
-            extracted_tests.append(test_data)
-            continue
-            
-        match2 = re.match(r'^(.*?)\s*-->\s*(.+)$', line, re.I)
-        if match2:
-            test_data["TestName"] = match2.group(1).strip()
-            result_str = match2.group(2).lower()
-            if "passed" in result_str or "success" in result_str:
-                test_data["Result"] = "PASS"
-            elif "failed" in result_str:
-                test_data["Result"] = "FAIL"
+        patterns = [
+            r'^(.*?)\s*-->\s*(Passed|Failed|Success)\s*-->\s*(.+)$',
+            r'^(.*?)\s*-->\s*(.+)$',
+            r'^\d+:\s*([A-Z_]+):\s*"([A-Z]+)"$',
+            r'^(.+?)\s+is\s+(success|failure|passed|failed)$',
+            r'^(.+?)\s+(Failed|Passed)$',
+        ]
+        
+        match = re.match(patterns[0], line, re.I)
+        if match:
+            test_data["TestName"] = match.group(1).strip()
+            test_data["Result"] = "PASS" if match.group(2).lower() in ["passed", "success"] else "FAIL"
+            test_data["Actual"] = match.group(3).strip()
+        else:
+            match = re.match(patterns[1], line, re.I)
+            if match:
+                test_data["TestName"] = match.group(1).strip()
+                result_str = match.group(2).lower()
+                if "passed" in result_str or "success" in result_str: test_data["Result"] = "PASS"
+                elif "failed" in result_str: test_data["Result"] = "FAIL"
+                else: test_data["Result"] = "INFO"
+                test_data["Actual"] = match.group(2).strip()
             else:
-                test_data["Result"] = "INFO"
-            test_data["Actual"] = match2.group(2).strip()
-            extracted_tests.append(test_data)
-            continue
-            
-        match3 = re.match(r'^\d+:\s*([A-Z_]+):\s*"([A-Z]+)"$', line)
-        if match3:
-            test_data["TestName"] = match3.group(1).strip()
-            result = match3.group(2).strip()
-            test_data["Result"] = result if result in ["PASS", "FAIL"] else "NA"
-            extracted_tests.append(test_data)
-            continue
-            
-        match4 = re.match(r'^(.+?)\s+is\s+(success|failure|passed|failed)$', line, re.I)
-        if match4:
-            test_data["TestName"] = match4.group(1).strip()
-            result_str = match4.group(2).lower()
-            test_data["Result"] = "PASS" if "success" in result_str or "passed" in result_str else "FAIL"
-            extracted_tests.append(test_data)
-            continue
-            
-        match5 = re.match(r'^(.+?)\s+(Failed|Passed)$', line, re.I)
-        if match5:
-            test_data["TestName"] = match5.group(1).strip()
-            test_data["Result"] = "PASS" if "passed" in match5.group(2).lower() else "FAIL"
-            extracted_tests.append(test_data)
-            continue
-            
-    for test in extracted_tests:
-        test_name_lower = test["TestName"].lower()
+                match = re.match(patterns[2], line)
+                if match:
+                    test_data["TestName"] = match.group(1).strip().replace("_", " ")
+                    result = match.group(2).strip()
+                    test_data["Result"] = result if result in ["PASS", "FAIL"] else "NA"
+                else:
+                    match = re.match(patterns[3], line, re.I)
+                    if match:
+                        test_data["TestName"] = match.group(1).strip()
+                        test_data["Result"] = "PASS" if match.group(2).lower() in ["success", "passed"] else "FAIL"
+                    else:
+                        match = re.match(patterns, line, re.I)
+                        if match:
+                            test_data["TestName"] = match.group(1).strip()
+                            test_data["Result"] = "PASS" if match.group(2).lower() == "passed" else "FAIL"
+                        else:
+                            continue
+                            
+        test_name_lower = test_data["TestName"].lower()
         for keyword, standard in KEYWORD_TO_STANDARD_MAP.items():
             if keyword in test_name_lower:
-                test["Standard"] = standard
+                test_data["Standard"] = standard
                 break
+        extracted_tests.append(test_data)
                 
     return extracted_tests
 
 def parse_report(uploaded_file):
     if not uploaded_file: return []
     try:
-        content = ""
-        if uploaded_file.name.lower().endswith('.csv'):
-            df = pd.read_csv(uploaded_file)
-            return df.to_dict(orient="records")
-        elif uploaded_file.type == "application/pdf":
-            with pdfplumber.open(uploaded_file) as pdf:
-                for page in pdf.pages: content += (page.extract_text() or "") + "\n"
-        elif uploaded_file.type in ("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/msword"):
-            doc = docx.Document(uploaded_file)
-            content = "\n".join(p.text for p in doc.paragraphs if p.text)
-        elif uploaded_file.type in ("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.ms-excel"):
-            df = pd.read_excel(uploaded_file)
-            return df.to_dict(orient="records")
-        else:
-            st.error(f"Unsupported file type: {uploaded_file.type}")
-            return []
-        
+        file_extension = os.path.splitext(uploaded_file.name.lower())[1]
+
+        if file_extension in ['.csv', '.xlsx']:
+            df = pd.read_csv(uploaded_file) if file_extension == '.csv' else pd.read_excel(uploaded_file)
+            df.columns = [str(c).strip().lower() for c in df.columns]
+            
+            rename_map = {
+                'test': 'TestName', 'standard': 'Standard', 'expected': 'Expected',
+                'actual': 'Actual', 'result': 'Result', 'description': 'Description',
+                'part': 'TestName', 'manufacturer pn': 'Actual'
+            }
+            df.rename(columns=rename_map, inplace=True)
+            return df.to_dict('records')
+
+        elif file_extension == '.pdf':
+             with pdfplumber.open(uploaded_file) as pdf:
+                content = "".join(page.extract_text() + "\n" for page in pdf.pages if page.extract_text())
+        else: # Treat as plain text
+             content = uploaded_file.getvalue().decode('utf-8', errors='ignore')
+
         return intelligent_parser(content)
     except Exception as e:
         st.error(f"An error occurred while parsing the file: {e}")
         return []
+
+def display_test_card(test_case, color):
+    details = f"<b>🧪 Test:</b> {test_case.get('TestName', 'N/A')}<br>"
+    display_fields = {
+        'Standard': '📘 Standard', 'Expected': '🎯 Expected', 'Actual': '📌 Actual', 'Description': '💬 Description'
+    }
+    for key, label in display_fields.items():
+        value = test_case.get(key)
+        if value and str(value).strip() and pd.notna(value) and str(value).lower() not in ['—', 'nan']:
+            details += f"<b>{label}:</b> {value}<br>"
+    st.markdown(f"<div class='card' style='border-left-color:{color};'>{details}</div>", unsafe_allow_html=True)
+
 
 # ---- Streamlit App Layout ----
 option = st.sidebar.radio("Navigate", ("Test Report Verification", "Test Requirement Generation", "Component Information", "Dashboard & Analytics"))
@@ -233,62 +240,35 @@ st.sidebar.info("This tool helps verify compliance reports, generate test requir
 # --- Test Report Verification Module ---
 if option == "Test Report Verification":
     st.subheader("Upload & Verify Test Report", anchor=False)
-    st.caption("Upload PDF/DOCX/XLSX/CSV reports. The parser extracts tests and groups them by PASS/FAIL status.")
+    st.caption("Upload text or structured reports (PDF, TXT, CSV, XLSX). The parser extracts and displays all relevant data.")
     uploaded_file = st.file_uploader("Upload a report file", type=["pdf", "docx", "xlsx", "csv", "txt", "log"])
     if uploaded_file:
-        parsed = parse_report(uploaded_file)
-        if parsed:
+        parsed_data = parse_report(uploaded_file)
+        if parsed_data:
             st.session_state.reports_verified += 1
             
-            failed_tests = [t for t in parsed if str(t.get("Result", "")).upper() == "FAIL"]
-            passed_tests = [t for t in parsed if str(t.get("Result", "")).upper() == "PASS"]
-            other_tests = [t for t in parsed if str(t.get("Result", "")).upper() not in ["PASS", "FAIL"]]
-            col1, col2 = st.columns(2)
-            with col1:
-                st.markdown(f"<h4 style='color:#1e9f50;'>✅ {len(passed_tests)} Passed Test Case(s)</h4>", unsafe_allow_html=True)
-                if passed_tests:
+            failed_tests = [t for t in parsed_data if "FAIL" in str(t.get("Result", "")).upper()]
+            passed_tests = [t for t in parsed_data if "PASS" in str(t.get("Result", "")).upper()]
+            other_tests = [t for t in parsed_data if not ("PASS" in str(t.get("Result", "")).upper() or "FAIL" in str(t.get("Result", "")).upper())]
+
+            st.markdown(f"### Found {len(passed_tests)} Passed, {len(failed_tests)} Failed, and {len(other_tests)} Other items.")
+
+            if passed_tests:
+                with st.expander("✅ Passed Cases", expanded=True):
                     for t in passed_tests:
-                        st.markdown(
-                            f"<div class='card' style='border-left-color:#1e9f50;'>"
-                            f"<b>🧪 Test:</b> {t.get('TestName', 'N/A')}<br>"
-                            f"<b>📘 Standard:</b> {t.get('Standard', 'N/A')}<br>"
-                            f"<b>📊 Result:</b> <span class='result-pass'>PASS</span><br>"
-                            f"<b>📌 Actual/Value:</b> {t.get('Actual', 'N/A')}<br>"
-                            f"</div>", unsafe_allow_html=True
-                        )
-                else:
-                    st.info("No passed tests were found in the report.")
+                        display_test_card(t, '#1e9f50')
             
-            with col2:
-                st.markdown(f"<h4 style='color:#c43a31;'>🔴 {len(failed_tests)} FAILED Test Case(s)</h4>", unsafe_allow_html=True)
-                if failed_tests:
+            if failed_tests:
+                with st.expander("🔴 Failed Cases", expanded=True):
                     for t in failed_tests:
-                        st.markdown(
-                            f"<div class='card' style='border-left-color:#c43a31;'>"
-                            f"<b>🧪 Test:</b> {t.get('TestName', 'N/A')}<br>"
-                            f"<b>📘 Standard:</b> {t.get('Standard', 'N/A')}<br>"
-                            f"<b>📊 Result:</b> <span class='result-fail'>FAIL</span><br>"
-                            f"<b>📌 Actual/Value:</b> {t.get('Actual', 'N/A')}<br>"
-                            f"</div>", unsafe_allow_html=True
-                        )
-                else:
-                    st.info("No failed tests were found in the report.")
+                        display_test_card(t, '#c43a31')
             
-            st.markdown("---")
             if other_tests:
-                with st.expander(f"ℹ️ View {len(other_tests)} Other/Informational Test Case(s)", expanded=False):
+                with st.expander("ℹ️ Other/Informational Items", expanded=False):
                     for t in other_tests:
-                        result_upper = str(t.get('Result', 'NA')).upper()
-                        st.markdown(
-                            f"<div class='card'>"
-                            f"<b>🧪 Test:</b> {t.get('TestName', 'N/A')}<br>"
-                            f"<b>📘 Standard:</b> {t.get('Standard', 'N/A')}<br>"
-                            f"<b>📊 Result:</b> <span class='result-na'>{result_upper}</span><br>"
-                            f"<b>📌 Actual/Value:</b> {t.get('Actual', 'N/A')}<br>"
-                            f"</div>", unsafe_allow_html=True
-                        )
+                        display_test_card(t, '#808080')
         else:
-            st.warning("No recognizable test data was extracted. Please check the report content and format.")
+            st.warning("No recognizable data was extracted. Please check the file content and format.")
 
 # --- Other Modules ---
 elif option == "Test Requirement Generation":
@@ -301,34 +281,15 @@ elif option == "Test Requirement Generation":
         test_cases = [l.strip() for l in text.split("\n") if l.strip()]
         if test_cases:
             st.session_state.requirements_generated += len(test_cases)
-            
-            reqs = []
+            st.markdown("#### Generated Requirements")
             for i, case in enumerate(test_cases):
                 found_req = next((info for key, info in TEST_CASE_KNOWLEDGE_BASE.items() if key.replace(" test", "") in case.lower()), None)
+                req_html = f"<div class='card' style='border-left-color:#7c3aed;'><b>Test Case:</b> {case.title()}<br><b>Req ID:</b> REQ_{i+1:03d}<br>"
                 if found_req:
-                    reqs.append({
-                        "Test Case": case.title(), "Requirement ID": f"REQ_{i+1:03d}",
-                        "Requirement Description": found_req["requirement"], "Required Equipment": ", ".join(found_req["equipment"])
-                    })
+                    req_html += f"<b>Description:</b> {found_req['requirement']}<br><b>Equipment:</b> {', '.join(found_req['equipment'])}"
                 else:
-                    reqs.append({
-                        "Test Case": case.title(), "Requirement ID": f"REQ_{i+1:03d}",
-                        "Requirement Description": "Generic requirement: System must handle this case according to relevant industry standards.", 
-                        "Required Equipment": "To be determined.",
-                        "external_search": case
-                    })
-            
-            st.markdown("#### Generated Requirements")
-            for r in reqs:
-                st.markdown(f"<div class='card' style='border-left-color:#7c3aed;'>"
-                            f"<b>📝 Test Case:</b> {r['Test Case']}<br>"
-                            f"<b>🆔 Requirement ID:</b> {r['Requirement ID']}<br>"
-                            f"<b>📋 Description:</b> {r['Requirement Description']}<br>"
-                            f"<b>🛠️ Required Equipment:</b> {r['Required Equipment']}"
-                            f"</div>", unsafe_allow_html=True)
-                if "external_search" in r:
-                    q = r["external_search"]
-                    st.caption(f"Research link for '{q}': [Google](https://www.google.com/search?q={q}+test+standard)")
+                    req_html += "<b>Description:</b> Generic requirement - system must handle this case.<br><b>Equipment:</b> To be determined."
+                st.markdown(req_html + "</div>", unsafe_allow_html=True)
 
 elif option == "Component Information":
     st.subheader("Key Component Information", anchor=False)
@@ -352,11 +313,11 @@ elif option == "Component Information":
     st.markdown("---")
     d = st.session_state.get('found_component', {})
     with st.form("component_form", clear_on_submit=True):
-        st.markdown("### Add Component to Database")
-        pn = st.text_input("Part Number", value=d.get("part_number", d.get("part_name", "")))
+        st.markdown("### Add Component to Project Database")
+        pn = st.text_input("Part Number", value=d.get("part_number", ""))
         mfg = st.text_input("Manufacturer", value=d.get("manufacturer", ""))
         func = st.text_input("Function / Part Name", value=d.get("part_name", d.get("function", "")))
-        notes = st.text_area("Notes (e.g., Certifications, Subsystem, Voltage)", value=d.get("certifications", ""))
+        notes = st.text_area("Notes (e.g., Certifications, Subsystem, Voltage)", value=d.get("certifications", d.get("subsystem", "")))
         
         if st.form_submit_button("Add Component"):
             if pn:
