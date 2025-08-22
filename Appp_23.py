@@ -5,6 +5,7 @@ import pdfplumber
 import openpyxl
 import re
 import os
+import base64
 
 # To parse .docx files, you need to install python-docx
 try:
@@ -26,6 +27,9 @@ st.markdown("""
 .result-fail{color:#c43a31; font-weight:700;}
 .result-na{color:#808080; font-weight:700;}
 a {text-decoration: none;}
+.main .block-container {
+    padding-top: 2rem;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -39,22 +43,29 @@ def init_session_state():
             st.session_state[key] = value
 init_session_state()
 
-# === Refined Header ===
-logo_col, title_col = st.columns([1, 5])
-with logo_col:
-    logo_path = "people_tech_logo.png"
-    if os.path.exists(logo_path):
-        st.image(logo_path, width=100)
-    else:
-        st.markdown("#### PEOPLE_TECH")
-with title_col:
-    st.markdown("""
-        <div style="background:var(--accent); padding:10px 22px; border-radius:14px;">
-          <h1 style="color:#fff; font-size:1.8em; margin:0; line-height:1.2;">E-Bike Regulatory Compliance & Safety Checking tool</h1>
-          <p style="color:#eaf4ff; margin:0; font-weight:500;">A People TECH Company Solution</p>
+# === FINAL HEADER ===
+def get_image_as_base64(path):
+    if os.path.exists(path):
+        with open(path, "rb") as img_file:
+            return base64.b64encode(img_file.read()).decode()
+    return ""
+
+logo_base64 = get_image_as_base64("people_tech_logo.png")
+
+if logo_base64:
+    st.markdown(f"""
+        <div style="display: flex; align-items: center; margin-bottom: 20px;">
+            <img src="data:image/png;base64,{logo_base64}" alt="Logo" style="height: 80px; margin-right: 20px;"/>
+            <div>
+                <h1 style="color:#0056b3; margin: 0; font-size: 2.8em; line-height: 1;">Regulatory Compliance</h1>
+                <h2 style="color:#0056b3; margin: 0; font-size: 1.8em; line-height: 1;">& Safety Verification Tool</h2>
+            </div>
         </div>
     """, unsafe_allow_html=True)
-st.markdown("<br>", unsafe_allow_html=True)
+else:
+    st.error("Logo file 'people_tech_logo.png' not found.")
+    st.title("Regulatory Compliance & Safety Verification Tool")
+
 
 # === KNOWLEDGE BASES ===
 KEYWORD_TO_STANDARD_MAP = {
@@ -111,19 +122,17 @@ COMPONENT_KNOWLEDGE_BASE = {
     "eeh-azt1v471": {"subsystem": "Charger/DC-DC", "part_name": "Hybrid Polymer Aluminum Electrolytic Capacitor", "manufacturer": "Panasonic", "type": "Electrolytic Capacitor", "capacitance": "470 µF", "voltage_rating": "35V", "esr": "20 mOhm", "package": "Radial Can", "package_type": "SMD", "certifications": "AEC-Q200"},
     
     # --- GENERAL-PURPOSE AUTOMOTIVE & INDUSTRIAL COMPONENTS ---
-    # Regulators
     "lm7805": {"subsystem": "General", "part_name": "Positive Voltage Regulator", "manufacturer": "Texas Instruments", "type": "Linear Regulator", "output_voltage": "5V", "input_voltage": "7V to 35V", "package": "TO-220", "package_type": "Through-Hole", "certifications": "Industrial"},
     "lm1117": {"subsystem": "General", "part_name": "Low Dropout Positive Voltage Regulator", "manufacturer": "ON Semiconductor", "type": "LDO Regulator", "output_voltage": "3.3V (Adjustable)", "package": "SOT-223", "package_type": "SMD", "certifications": "Industrial"},
     "lm2596": {"subsystem": "General", "part_name": "Step-Down Voltage Regulator", "manufacturer": "Texas Instruments", "type": "Switching Regulator", "output_voltage": "1.2V to 37V", "package": "TO-263", "package_type": "SMD", "certifications": "Industrial"},
-    # MOSFETs
     "irfz44n": {"subsystem": "General", "part_name": "N-Channel Power MOSFET", "manufacturer": "Infineon", "type": "MOSFET", "drain_source_voltage_vdss": "55V", "package": "TO-220AB", "package_type": "Through-Hole", "certifications": "Industrial"},
     "bss138": {"subsystem": "General", "part_name": "N-Channel Logic Level MOSFET", "manufacturer": "NXP", "type": "MOSFET", "drain_source_voltage_vdss": "50V", "package": "SOT-23", "package_type": "SMD", "certifications": "AEC-Q101"},
-    # ICs
     "lm358": {"subsystem": "General", "part_name": "Dual General-Purpose Op-Amp", "manufacturer": "Texas Instruments", "type": "Op-Amp", "supply_voltage": "3V to 32V", "package": "SOIC-8", "package_type": "SMD", "certifications": "Industrial/AEC-Q100 versions"},
     "stm32f407": {"subsystem": "General", "part_name": "ARM Cortex-M4 MCU", "manufacturer": "STMicroelectronics", "type": "MCU", "flash_memory": "1MB", "package": "LQFP144", "package_type": "SMD", "certifications": "Industrial"},
-    # Diodes
     "1n4007": {"subsystem": "General", "part_name": "General Purpose Rectifier Diode", "manufacturer": "Multiple", "type": "Diode", "peak_reverse_voltage": "1000V", "package": "DO-41", "package_type": "Through-Hole", "certifications": "Industrial"},
     "us1m": {"subsystem": "General", "part_name": "Ultrafast Surface-Mount Rectifier", "manufacturer": "Vishay", "type": "Diode", "peak_reverse_voltage": "1000V", "package": "SMA (DO-214AC)", "package_type": "SMD", "certifications": "AEC-Q101"},
+    "bq76952": {"manufacturer": "Texas Instruments", "function": "Battery Monitor IC", "voltage": "Up to 80V"},
+    "irfb4110": {"manufacturer": "Infineon", "function": "N‑MOSFET", "voltage": "100V", "current": "180A"},
 }
 
 def intelligent_parser(text: str):
@@ -225,7 +234,7 @@ st.sidebar.info("This tool helps verify compliance reports, generate test requir
 if option == "Test Report Verification":
     st.subheader("Upload & Verify Test Report", anchor=False)
     st.caption("Upload PDF/DOCX/XLSX/CSV reports. The parser extracts tests and groups them by PASS/FAIL status.")
-    uploaded_file = st.file_uploader("Upload a report file", type=["pdf", "docx", "xlsx", "csv"])
+    uploaded_file = st.file_uploader("Upload a report file", type=["pdf", "docx", "xlsx", "csv", "txt", "log"])
     if uploaded_file:
         parsed = parse_report(uploaded_file)
         if parsed:
@@ -325,44 +334,39 @@ elif option == "Component Information":
     st.subheader("Key Component Information", anchor=False)
     st.caption("Look up parts in the internal database or use web search shortcuts.")
     
-    part_q = st.text_input("Quick Lookup (part number)", placeholder="e.g., spc560p50l3, irfz44n...").lower().strip()
+    part_q = st.text_input("Quick Lookup (part number)", placeholder="e.g., irfz44n, bq76952").lower().strip()
     if st.button("Find Component"):
-        # Search the comprehensive database
         found_key = next((k for k in COMPONENT_KNOWLEDGE_BASE if k in part_q), None)
         if found_key:
-            found = COMPONENT_KNOWLEDGE_BASE[found_key]
-            st.success(f"Found: {part_q.upper()}. Details populated below.")
-            st.session_state.found_component = {"part_number": part_q.upper(), **found}
+            st.session_state.found_component = {"part_number": found_key, **COMPONENT_KNOWLEDGE_BASE[found_key]}
+            st.success(f"Found: {found_key.upper()}. Details populated below.")
         else:
             st.session_state.found_component = {}
-            st.warning("Not in internal DB. Research with these links:")
+            st.warning("Not in internal DB. Use research links:")
             if part_q:
-                c1, c2, c3, c4 = st.columns(4)
+                c1, c2, c3 = st.columns(3)
                 c1.link_button("Octopart", f"https://octopart.com/search?q={part_q}")
                 c2.link_button("Digi-Key", f"https://www.digikey.com/en/products/result?s={part_q}")
-                c3.link_button("Mouser", f"https://www.mouser.com/Search/Refine?Keyword={part_q}")
-                c4.link_button("Google", f"https://www.google.com/search?q={part_q}+datasheet")
+                c3.link_button("Google", f"https://www.google.com/search?q={part_q}+datasheet")
                 
     st.markdown("---")
-    
     d = st.session_state.get('found_component', {})
     with st.form("component_form", clear_on_submit=True):
         st.markdown("### Add Component to Database")
-        pn = st.text_input("Part Number", value=d.get("part_number", ""))
+        pn = st.text_input("Part Number", value=d.get("part_number", d.get("part_name", "")))
         mfg = st.text_input("Manufacturer", value=d.get("manufacturer", ""))
         func = st.text_input("Function / Part Name", value=d.get("part_name", d.get("function", "")))
-        val1 = st.text_input("Key Spec (e.g., Voltage, Resistance)", value=d.get("output_voltage", d.get("voltage_rating", "")))
-        notes = st.text_area("Notes (e.g., certifications, package)", value=d.get("certifications", ""))
+        notes = st.text_area("Notes (e.g., Certifications, Subsystem, Voltage)", value=d.get("certifications", ""))
         
         if st.form_submit_button("Add Component"):
             if pn:
-                new_row = pd.DataFrame([{"Part Number": pn, "Manufacturer": mfg, "Function": func, "Key Spec": val1, "Notes": notes}])
+                new_row = pd.DataFrame([{"Part Number": pn, "Manufacturer": mfg, "Function": func, "Notes": notes}])
                 st.session_state.component_db = pd.concat([st.session_state.component_db, new_row], ignore_index=True)
                 st.success(f"Component '{pn}' added to the database.")
                 st.session_state.found_component = {}
 
     if not st.session_state.component_db.empty:
-        st.markdown("#### Component Database")
+        st.markdown("#### Project Component Database")
         st.dataframe(st.session_state.component_db, use_container_width=True)
 
 else: # Dashboard
