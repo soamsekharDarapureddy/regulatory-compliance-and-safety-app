@@ -69,7 +69,7 @@ TEST_CASE_KNOWLEDGE_BASE = { "over-voltage": {"requirement": "DUT must withstand
 # --- Enriched Component Databases ---
 COMPONENT_KNOWLEDGE_BASE = {
     # Key Components with Detailed Specs
-    "spc560p50l3": {"subsystem": "VCU", "part_name": "32-bit Automotive MCU", "manufacturer": "STMicroelectronics", "grade": "Automotive", "voltage_min": 3.0, "voltage_max": 5.5, "temp_min": -40, "temp_max": 125},
+    "spc560p50l3": {"subsystem": "VCU", "part_name": "32-bit Automotive Microcontroller", "manufacturer": "STMicroelectronics", "grade": "Automotive", "voltage_min": 3.0, "voltage_max": 5.5, "temp_min": -40, "temp_max": 125},
     "tja1051t": {"subsystem": "VCU", "part_name": "High-speed CAN Transceiver", "manufacturer": "NXP", "grade": "Automotive", "voltage_min": 4.5, "voltage_max": 5.5, "temp_min": -40, "temp_max": 150},
     "tle4275g": {"subsystem": "VCU", "part_name": "5V LDO Regulator", "manufacturer": "Infineon", "grade": "Automotive", "voltage_min": 5.5, "voltage_max": 45, "current_max": 0.45, "temp_min": -40, "temp_max": 150},
     "fsbb30ch60f": {"subsystem": "Motor Controller", "part_name": "Motion SPM® 3 IGBT Module", "manufacturer": "onsemi", "grade": "Industrial", "voltage_max": 600, "current_max": 30, "temp_min": -20, "temp_max": 125},
@@ -239,7 +239,7 @@ elif option == "Component Information":
     st.subheader("Key Component Information", anchor=False)
     st.caption("Look up parts across all internal databases for detailed specifications.")
     COMBINED_DB = {**COMPONENT_KNOWLEDGE_BASE, **CLUSTER_COMPONENT_KNOWLEDGE_BASE}
-    part_q = st.text_input("Quick Lookup (part number)", placeholder="e.g., tle4275g, spc560p50l3").lower().strip()
+    part_q = st.text_input("Quick Lookup (part number)", placeholder="e.g., tle4275g, tlv9001qdckrq1").lower().strip()
     if st.button("Find Component"):
         if part_q:
             key = next((k for k in COMBINED_DB if part_q in k.lower()), None)
