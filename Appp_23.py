@@ -36,9 +36,32 @@ a:hover {text-decoration: underline;}
 """, unsafe_allow_html=True)
 
 # ===============================================
+# === HEADER AND LOGO ===
+# ===============================================
+def get_image_as_base64(path):
+    if os.path.exists(path):
+        with open(path, "rb") as img_file:
+            return base64.b64encode(img_file.read()).decode()
+    return ""
+
+logo_base64 = get_image_as_base64("people_tech_logo.png")
+if logo_base64:
+    st.markdown(f"""
+        <div style="display: flex; align-items: center; margin-bottom: 25px;">
+            <img src="data:image/png;base64,{logo_base64}" alt="Logo" style="height: 120px; margin-right: 25px;"/>
+            <div>
+                <h1 style="color:#0056b3; margin: 0; font-size: 2.2em; line-height: 1.0;">Regulatory Compliance</h1>
+                <h2 style="color:#0056b3; margin: 0; font-size: 1.4em; line-height: 1.0;">& Safety Verification Tool</h2>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+else:
+    st.error("Logo file 'people_tech_logo.png' not found.")
+    st.title("Regulatory Compliance & Safety Verification Tool")
+
+# ===============================================
 # === KNOWLEDGE BASES & DATABASE LOADING ===
 # ===============================================
-
 @st.cache_data
 def load_bom_data(filepath='PCBA-SVIC_3.3_31Dec24_BOM.xlsx'):
     try:
