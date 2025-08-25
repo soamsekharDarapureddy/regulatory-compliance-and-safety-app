@@ -69,56 +69,53 @@ TEST_CASE_KNOWLEDGE_BASE = { "over-voltage": {"requirement": "Withstand over-vol
 # --- COMPLETE AND ENRICHED COMPONENT DATABASES ---
 COMPONENT_KNOWLEDGE_BASE = {
     # Enriched Key Components
-    "spc560p50l3": {"subsystem": "VCU", "part_name": "32-bit Automotive MCU", "manufacturer": "STMicroelectronics", "grade": "Automotive (AEC-Q100)", "voltage_min": 3.0, "voltage_max": 5.5, "temp_min": -40, "temp_max": 125, "performance_tier": "576KB Flash"},
-    "tja1051t": {"subsystem": "VCU", "part_name": "High-speed CAN Transceiver", "manufacturer": "NXP", "grade": "Automotive (AEC-Q100)", "voltage_min": 4.5, "voltage_max": 5.5, "temp_min": -40, "temp_max": 150, "performance_tier": "1 Mbit/s"},
-    "tle4275g": {"subsystem": "VCU", "part_name": "5V LDO Regulator", "manufacturer": "Infineon", "grade": "Automotive (AEC-Q100)", "voltage_min": 5.5, "voltage_max": 45, "current_max": 0.45, "temp_min": -40, "temp_max": 150, "performance_tier": "450mA Output"},
-    "fsbb30ch60f": {"subsystem": "Motor Controller", "part_name": "Motion SPM® 3 IGBT Module", "manufacturer": "onsemi", "grade": "Industrial", "voltage_max": 600, "current_max": 30, "temp_min": -20, "temp_max": 125, "performance_tier": "30A / 600V"},
-    "wslp2512r0100fe": {"subsystem": "Motor Controller", "part_name": "Power Metal Strip® Resistor", "manufacturer": "Vishay", "grade": "Automotive (AEC-Q200)", "voltage_max": 50, "temp_min": -65, "temp_max": 170, "performance_tier": "10 mΩ, 1W"},
-    "bq76952": {"subsystem": "BMS", "part_name": "16-Series Battery Monitor", "manufacturer": "Texas Instruments", "grade": "Automotive (AEC-Q100)", "voltage_max": 80, "temp_min": -40, "temp_max": 110, "performance_tier": "Monitors 3-S to 16-S"},
-    "irfz44n": {"subsystem": "General", "part_name": "N-Channel Power MOSFET", "manufacturer": "Infineon", "grade": "Industrial", "voltage_max": 55, "current_max": 49, "temp_min": -55, "temp_max": 175, "performance_tier": "49A Continuous"},
-    "zldo1117qg33ta": {"subsystem": "General", "part_name": "1A LDO Positive Regulator", "manufacturer": "Diodes Incorporated", "grade": "Automotive", "voltage_max": 18, "current_max": 1, "temp_min": -40, "temp_max": 125, "performance_tier": "1A Output Current"},
-    "ap63357qzv-7": {"subsystem": "General", "part_name": "3.5A Synchronous Buck Converter", "manufacturer": "Diodes Incorporated", "grade": "Automotive", "voltage_min": 3.8, "voltage_max": 32, "current_max": 3.5, "temp_min": -40, "temp_max": 125, "performance_tier": "3.5A Continuous Output"},
-    "pca9306idcurq1": {"subsystem": "General", "part_name": "Dual I2C Bus Voltage-Level Translator", "manufacturer": "Texas Instruments", "grade": "Automotive (AEC-Q100)", "voltage_min": 1.2, "voltage_max": 5.5, "temp_min": -40, "temp_max": 125, "performance_tier": "400-kbps I2C"},
-    "mcp2518fdt-e/sl": {"subsystem": "General", "part_name": "CAN FD Controller with SPI", "manufacturer": "Microchip Technology", "grade": "Automotive (AEC-Q100)", "voltage_min": 2.7, "voltage_max": 5.5, "temp_min": -40, "temp_max": 150, "performance_tier": "8 Mbps CAN FD"},
-    "iso1042bqdwvq1": {"subsystem": "General", "part_name": "Isolated CAN FD Transceiver", "manufacturer": "Texas Instruments", "grade": "Automotive (AEC-Q100)", "voltage_min": 1.71, "voltage_max": 5.5, "temp_min": -40, "temp_max": 125, "performance_tier": "5-kVrms Isolation"},
-    "pesd2canfd27v-tr": {"subsystem": "General", "part_name": "CAN FD ESD Protection Diode", "manufacturer": "Nexperia USA Inc.", "grade": "Automotive (AEC-Q101)", "voltage_max": 27, "performance_tier": "Low Clamping Voltage"},
-    "tlv9001qdckrq1": {"subsystem": "General", "part_name": "Low-Power RRIO Op-Amp", "manufacturer": "Texas Instruments", "grade": "Automotive (AEC-Q100)", "voltage_min": 1.8, "voltage_max": 5.5, "temp_min": -40, "temp_max": 125, "performance_tier": "1-MHz Gain-Bandwidth"},
-    "ncv8161asn180t1g": {"subsystem": "General", "part_name": "450mA LDO Regulator", "manufacturer": "onsemi", "grade": "Automotive (AEC-Q100)", "voltage_max": 5.5, "current_max": 0.45, "temp_min": -40, "temp_max": 125, "performance_tier": "Ultra-Low Iq"},
-
-    # Restored full list of other components
-    "fh28-10s-0.5sh(05)": {"manufacturer": "Hirose Electric Co Ltd", "part_name": "Connector"},
-    "gcm155l81e104ke02d": {"manufacturer": "Murata Electronics", "part_name": "Capacitor"},
-    "cga3e3x7s1a225k080ae": {"manufacturer": "TDK Corporation", "part_name": "Capacitor"},
-    "cga3e1x7r1e105k080ac": {"manufacturer": "TDK Corporation", "part_name": "Capacitor"},
-    "d5v0h1b2lpq-7b": {"manufacturer": "Diodes Incorporated", "part_name": "Diode"},
-    "szmmbz9v1alt3g": {"manufacturer": "onsemi", "part_name": "Diode"},
-    "74279262": {"manufacturer": "Würth Elektronik", "part_name": "Ferrite Bead"},
-    "voma617a-4x001t": {"manufacturer": "Vishay Semiconductor Opto Division", "part_name": "Optocoupler"},
-    "rq3g270bjfratcb": {"manufacturer": "Rohm Semiconductor", "part_name": "MOSFET"},
-    "ac0402jr-070rl": {"manufacturer": "YAGEO", "part_name": "Resistor"},
-    "lt8912b": {"manufacturer": "Lontium", "part_name": "MIPI DSI/CSI-2 Bridge"},
-    "sn74lv1t34qdckrq1": {"manufacturer": "Texas Instruments", "part_name": "Buffer"},
-    "20279-001e-03": {"manufacturer": "I-PEX", "part_name": "Connector"},
-    "ecmf04-4hswm10y": {"manufacturer": "STMicroelectronics", "part_name": "Common Mode Filter"},
-    "iam-20680ht": {"manufacturer": "TDK InvenSense", "part_name": "IMU Sensor"},
-    "attiny1616-szt-vao": {"manufacturer": "Microchip", "part_name": "MCU"},
-    "qmc5883l": {"manufacturer": "QST", "part_name": "Magnetometer"},
-    "bd83a04efv-me2": {"manufacturer": "Rohm Semiconductor", "part_name": "LED Driver"},
-    "y4ete00a0aa": {"manufacturer": "Quectel", "part_name": "LTE Module"},
-    "yf0023aa": {"manufacturer": "Quectel", "part_name": "Wi-Fi/BT Antenna"},
+    "spc560p50l3": {"subsystem": "VCU", "part_name": "32-bit Automotive MCU", "use": "Main vehicle control unit processing", "manufacturer": "STMicroelectronics", "grade": "Automotive (AEC-Q100)", "voltage_min": 3.0, "voltage_max": 5.5, "temp_min": -40, "temp_max": 125, "performance_tier": "576KB Flash"},
+    "tja1051t": {"subsystem": "VCU", "part_name": "High-speed CAN Transceiver", "use": "CAN bus communication interface", "manufacturer": "NXP", "grade": "Automotive (AEC-Q100)", "voltage_min": 4.5, "voltage_max": 5.5, "temp_min": -40, "temp_max": 150, "performance_tier": "1 Mbit/s"},
+    "tle4275g": {"subsystem": "VCU", "part_name": "5V LDO Regulator", "use": "Power supply for VCU components", "manufacturer": "Infineon", "grade": "Automotive (AEC-Q100)", "voltage_min": 5.5, "voltage_max": 45, "current_max": 0.45, "temp_min": -40, "temp_max": 150, "performance_tier": "450mA Output"},
+    "fsbb30ch60f": {"subsystem": "Motor Controller", "part_name": "Motion SPM® 3 IGBT Module", "use": "Motor drive power stage", "manufacturer": "onsemi", "grade": "Industrial", "voltage_max": 600, "current_max": 30, "temp_min": -20, "temp_max": 125, "performance_tier": "30A / 600V"},
+    "wslp2512r0100fe": {"subsystem": "Motor Controller", "part_name": "Power Metal Strip® Resistor", "use": "Current sensing for motor control", "manufacturer": "Vishay", "grade": "Automotive (AEC-Q200)", "voltage_max": 50, "temp_min": -65, "temp_max": 170, "performance_tier": "10 mΩ, 1W"},
+    "bq76952": {"subsystem": "BMS", "part_name": "16-Series Battery Monitor", "use": "Battery cell monitoring and protection", "manufacturer": "Texas Instruments", "grade": "Automotive (AEC-Q100)", "voltage_max": 80, "temp_min": -40, "temp_max": 110, "performance_tier": "Monitors 3-S to 16-S"},
+    "irfz44n": {"subsystem": "General", "part_name": "N-Channel Power MOSFET", "use": "Switching applications", "manufacturer": "Infineon", "grade": "Industrial", "voltage_max": 55, "current_max": 49, "temp_min": -55, "temp_max": 175, "performance_tier": "49A Continuous"},
+    
+    # Full list of other components with descriptions and uses
+    "fh28-10s-0.5sh(05)": {"part_name": "Connector, 10-pin", "use": "Board-to-board connection", "manufacturer": "Hirose Electric Co Ltd", "subsystem": "General"},
+    "gcm155l81e104ke02d": {"part_name": "Capacitor 0.1uF", "use": "Decoupling and filtering", "manufacturer": "Murata Electronics", "subsystem": "General"},
+    "cga3e3x7s1a225k080ae": {"part_name": "Capacitor 2.2uF", "use": "Decoupling and filtering", "manufacturer": "TDK Corporation", "subsystem": "General"},
+    "grt1555c1e220ja02j": {"part_name": "Capacitor 22pF", "use": "Tuning and timing circuits", "manufacturer": "Murata Electronics", "subsystem": "General"},
+    "grt155r61a475me13d": {"part_name": "Capacitor 4.7uF", "use": "Decoupling and filtering", "manufacturer": "Murata Electronics", "subsystem": "General"},
+    "grt31cr61a476ke13l": {"part_name": "Capacitor 47uF", "use": "Bulk capacitance", "manufacturer": "Murata Electronics", "subsystem": "General"},
+    "cga3e1x7r1e105k080ac": {"part_name": "Capacitor 1uF", "use": "Decoupling and filtering", "manufacturer": "TDK Corporation", "subsystem": "General"},
+    "cga2b2c0g1h180j050ba": {"part_name": "Capacitor 18pF", "use": "Tuning and timing circuits", "manufacturer": "TDK Corporation", "subsystem": "General"},
+    "c0402c103k4racauto": {"part_name": "Capacitor 10nF", "use": "Decoupling and filtering", "manufacturer": "KEMET", "subsystem": "General"},
+    "d5v0h1b2lpq-7b": {"part_name": "ESD Protection Diode", "use": "Protection against electrostatic discharge", "manufacturer": "Diodes Incorporated", "subsystem": "General"},
+    "szmmbz9v1alt3g": {"part_name": "Zener Diode 9.1V", "use": "Voltage regulation", "manufacturer": "onsemi", "subsystem": "General"},
+    "74279262": {"part_name": "Ferrite Bead 120 Ohm", "use": "Noise suppression", "manufacturer": "Würth Elektronik", "subsystem": "General"},
+    "voma617a-4x001t": {"part_name": "Optocoupler, Phototransistor Output", "use": "Signal isolation", "manufacturer": "Vishay Semiconductor Opto Division", "subsystem": "General"},
+    "rq3g270bjfratcb": {"part_name": "P-Channel MOSFET", "use": "Switching applications", "manufacturer": "Rohm Semiconductor", "subsystem": "General"},
+    "ac0402jr-070rl": {"part_name": "Resistor, 0 Ohm Jumper", "use": "Circuit configuration", "manufacturer": "YAGEO", "subsystem": "General"},
+    "zldo1117qg33ta": {"part_name": "1A LDO Positive Regulator", "use": "Power supply regulation", "manufacturer": "Diodes Incorporated", "grade": "Automotive", "voltage_max": 18, "current_max": 1, "temp_min": -40, "temp_max": 125, "performance_tier": "1A Output Current"},
+    "ap63357qzv-7": {"part_name": "3.5A Synchronous Buck Converter", "use": "Power supply conversion", "manufacturer": "Diodes Incorporated", "grade": "Automotive", "voltage_min": 3.8, "voltage_max": 32, "current_max": 3.5, "temp_min": -40, "temp_max": 125, "performance_tier": "3.5A Continuous Output"},
+    "pca9306idcurq1": {"part_name": "Dual I2C Bus Voltage-Level Translator", "use": "I2C voltage level shifting", "manufacturer": "Texas Instruments", "grade": "Automotive (AEC-Q100)", "voltage_min": 1.2, "voltage_max": 5.5, "temp_min": -40, "temp_max": 125, "performance_tier": "400-kbps I2C"},
+    "mcp2518fdt-e/sl": {"part_name": "CAN FD Controller with SPI", "use": "CAN bus interface", "manufacturer": "Microchip Technology", "grade": "Automotive (AEC-Q100)", "voltage_min": 2.7, "voltage_max": 5.5, "temp_min": -40, "temp_max": 150, "performance_tier": "8 Mbps CAN FD"},
+    "iso1042bqdwvq1": {"part_name": "Isolated CAN FD Transceiver", "use": "Isolated CAN bus communication", "manufacturer": "Texas Instruments", "grade": "Automotive (AEC-Q100)", "voltage_min": 1.71, "voltage_max": 5.5, "temp_min": -40, "temp_max": 125, "performance_tier": "5-kVrms Isolation"},
+    "pesd2canfd27v-tr": {"part_name": "CAN FD ESD Protection Diode", "use": "ESD protection for CAN bus", "manufacturer": "Nexperia USA Inc.", "grade": "Automotive (AEC-Q101)", "voltage_max": 27, "performance_tier": "Low Clamping Voltage"},
+    "tlv9001qdckrq1": {"part_name": "Low-Power RRIO Op-Amp", "use": "Signal amplification", "manufacturer": "Texas Instruments", "grade": "Automotive (AEC-Q100)", "voltage_min": 1.8, "voltage_max": 5.5, "temp_min": -40, "temp_max": 125, "performance_tier": "1-MHz Gain-Bandwidth"},
+    "ncv8161asn180t1g": {"part_name": "450mA LDO Regulator", "use": "Power supply regulation", "manufacturer": "onsemi", "grade": "Automotive (AEC-Q100)", "voltage_max": 5.5, "current_max": 0.45, "temp_min": -40, "temp_max": 125, "performance_tier": "Ultra-Low Iq"},
+    "ecmf04-4hswm10y": {"part_name": "Common Mode Filter for HDMI", "use": "Noise filtering for HDMI interface", "manufacturer": "STMicroelectronics", "subsystem": "General"},
+    "attiny1616-szt-vao": {"part_name": "8-bit picoPower AVR MCU", "use": "Microcontroller for embedded applications", "manufacturer": "Microchip", "grade": "Automotive (AEC-Q100)"},
+    "y4ete00a0aa": {"part_name": "LTE-A Cat 6 Module", "use": "Cellular communication", "manufacturer": "Quectel", "subsystem": "Connectivity"},
+    "yf0023aa": {"part_name": "Wi-Fi & Bluetooth Antenna", "use": "Wireless communication", "manufacturer": "Quectel", "subsystem": "Connectivity"},
 }
 
 CLUSTER_COMPONENT_KNOWLEDGE_BASE = {
-    "mb9df125": {"subsystem": "Instrument Cluster", "part_name": "32-bit MCU with Graphics", "manufacturer": "Spansion (Cypress)", "grade": "Automotive (AEC-Q100)", "voltage_min": 2.7, "voltage_max": 5.5, "temp_min": -40, "temp_max": 105, "performance_tier": "Atlas-L Series"},
-    "veml6031x00": {"subsystem": "ALS Board", "part_name": "Ambient Light Sensor", "manufacturer": "Vishay", "grade": "Automotive (AEC-Q100)", "voltage_min": 1.7, "voltage_max": 3.6, "temp_min": -40, "temp_max": 110, "performance_tier": "I2C Interface"},
-    "grt188c81a106me13d": {"subsystem": "ALS Board", "part_name": "10uF Capacitor", "manufacturer": "Murata"},
-    "rt0603fre0710rl": {"subsystem": "ALS Board", "part_name": "10 Ohm Resistor", "manufacturer": "YAGEO"},
-    "5019530507": {"subsystem": "ALS Board", "part_name": "5-Pin Header", "manufacturer": "Molex"},
-    "01270019-00": {"subsystem": "VIC Module", "part_name": "ANTENNA GPS", "manufacturer": "Unknown", "grade": "Automotive"},
-    "01270020-00": {"subsystem": "VIC Module", "part_name": "ANTENNA WIFI", "manufacturer": "Unknown", "grade": "Automotive"},
-    "01270021-00": {"subsystem": "VIC Module", "part_name": "ANTENNA LTE", "manufacturer": "Unknown", "grade": "Automotive"},
-    "p0024-03": {"subsystem": "VIC Module", "part_name": "PCBA BOARD", "manufacturer": "Unknown", "grade": "Automotive"},
-    "01270018-00": {"subsystem": "VIC Module", "part_name": "SENSOR ALS-PCBA", "manufacturer": "Unknown", "grade": "Automotive"},
+    "mb9df125": {"subsystem": "Instrument Cluster", "part_name": "32-bit MCU with Graphics", "use": "Main processor for instrument cluster", "manufacturer": "Spansion (Cypress)", "grade": "Automotive (AEC-Q100)", "voltage_min": 2.7, "voltage_max": 5.5, "temp_min": -40, "temp_max": 105, "performance_tier": "Atlas-L Series"},
+    "veml6031x00": {"subsystem": "ALS Board", "part_name": "Ambient Light Sensor", "use": "Detecting ambient light for display brightness control", "manufacturer": "Vishay", "grade": "Automotive (AEC-Q100)", "voltage_min": 1.7, "voltage_max": 3.6, "temp_min": -40, "temp_max": 110, "performance_tier": "I2C Interface"},
+    "grt188c81a106me13d": {"subsystem": "ALS Board", "part_name": "10uF Capacitor", "use": "Decoupling and filtering", "manufacturer": "Murata"},
+    "rt0603fre0710rl": {"subsystem": "ALS Board", "part_name": "10 Ohm Resistor", "use": "Current limiting", "manufacturer": "YAGEO"},
+    "5019530507": {"subsystem": "ALS Board", "part_name": "5-Pin Header", "use": "Board-to-board connection", "manufacturer": "Molex"},
+    "01270019-00": {"subsystem": "VIC Module", "part_name": "ANTENNA GPS", "use": "GPS signal reception", "manufacturer": "Unknown", "grade": "Automotive"},
+    "01270020-00": {"subsystem": "VIC Module", "part_name": "ANTENNA WIFI", "use": "Wi-Fi signal reception", "manufacturer": "Unknown", "grade": "Automotive"},
+    "01270021-00": {"subsystem": "VIC Module", "part_name": "ANTENNA LTE", "use": "LTE signal reception", "manufacturer": "Unknown", "grade": "Automotive"},
 }
 
 # --- Helper Functions ---
@@ -176,10 +173,12 @@ def display_executive_component_details(part_number, data):
     st.markdown(f"<div class='executive-card'>", unsafe_allow_html=True)
     st.markdown(f"<div class='executive-title'>{data.get('part_name', 'N/A')}</div>", unsafe_allow_html=True)
     st.markdown(f"<div class='executive-subtitle'>Part Number: <b>{part_number.upper()}</b> | Manufacturer: <b>{data.get('manufacturer', 'N/A')}</b></div>", unsafe_allow_html=True)
+    st.markdown(f"<p><b>Use:</b> {data.get('use', 'N/A')}</p>", unsafe_allow_html=True)
     st.markdown("<div class='kpi-grid'>", unsafe_allow_html=True)
-    st.markdown(f"<div class='kpi-box'><div class='kpi-label'>Qualification</div><div class='kpi-value'>🏅 {data.get('grade', 'N/A')}</div></div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='kpi-box'><div class='kpi-label'>Qualification</div><div class='kpi-value'>🏅 {data.get('grade', 'Commercial')}</div></div>", unsafe_allow_html=True)
     vmin, vmax = data.get('voltage_min'), data.get('voltage_max')
     if vmin is not None and vmax is not None: st.markdown(f"<div class='kpi-box'><div class='kpi-label'>Voltage Domain</div><div class='kpi-value'>⚡ {vmin}V – {vmax}V</div></div>", unsafe_allow_html=True)
+    elif vmax is not None: st.markdown(f"<div class='kpi-box'><div class='kpi-label'>Voltage (Max)</div><div class='kpi-value'>⚡ {vmax}V</div></div>", unsafe_allow_html=True)
     tmin, tmax = data.get('temp_min'), data.get('temp_max')
     if tmin is not None and tmax is not None: st.markdown(f"<div class='kpi-box'><div class='kpi-label'>Temp Resilience</div><div class='kpi-value'>🌡️ {tmin}°C to {tmax}°C</div></div>", unsafe_allow_html=True)
     if 'performance_tier' in data: st.markdown(f"<div class='kpi-box'><div class='kpi-label'>Performance Tier</div><div class='kpi-value'>📈 {data.get('performance_tier')}</div></div>", unsafe_allow_html=True)
@@ -189,7 +188,7 @@ def display_executive_component_details(part_number, data):
     st.markdown("</div>", unsafe_allow_html=True)
 
 # ---- Streamlit App Layout ----
-option = st.sidebar.radio("Navigate", ("Test Report Verification", "Test Requirement Generation", "Component Information", "Dashboard & Analytics"))
+option = st.sidebar.radio("Navigate", ("Test Report Verification", "Component Information", "Test Requirement Generation", "Dashboard & Analytics"))
 st.sidebar.info("An integrated tool for automotive compliance.")
 
 if option == "Test Report Verification":
@@ -220,6 +219,7 @@ elif option == "Component Information":
     st.caption("Look up parts across all internal databases for detailed specifications.")
     COMBINED_DB = {**COMPONENT_KNOWLEDGE_BASE, **CLUSTER_COMPONENT_KNOWLEDGE_BASE}
     part_q = st.text_input("Quick Lookup (part number)", placeholder="e.g., tlv9001qdckrq1, spc560p50l3").lower().strip()
+    
     if st.button("Find Component"):
         if part_q:
             key = next((k for k in COMBINED_DB if part_q in k.lower()), None)
@@ -228,6 +228,7 @@ elif option == "Component Information":
             else:
                 st.session_state.found_component = {}
                 st.warning("Component not found.")
+    
     if st.session_state.found_component:
         display_executive_component_details(st.session_state.found_component['part_number'], st.session_state.found_component)
 
